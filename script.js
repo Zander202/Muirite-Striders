@@ -346,21 +346,35 @@ function injectMobileStyles() {
 
     /* â”€â”€ RESULTS TABLE â”€â”€ */
     .table-wrap {
-      overflow-x: auto !important;
+      overflow-x: hidden !important;
       -webkit-overflow-scrolling: touch !important;
       border-radius: 12px !important;
     }
     .rtbl {
       font-size: 11.5px !important;
-      min-width: 460px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      table-layout: fixed !important;
     }
     .rtbl th {
-      padding: 10px 8px !important;
+      padding: 9px 5px !important;
       font-size: 10px !important;
       letter-spacing: 0.5px !important;
     }
     .rtbl td {
-      padding: 9px 8px !important;
+      padding: 9px 5px !important;
+      word-break: break-word !important;
+      line-height: 1.25 !important;
+    }
+    .rtbl th:nth-child(1), .rtbl td:nth-child(1) { width: 12% !important; }
+    .rtbl th:nth-child(2), .rtbl td:nth-child(2) { width: 34% !important; }
+    .rtbl th:nth-child(3), .rtbl td:nth-child(3) { width: 20% !important; }
+    .rtbl th:nth-child(4), .rtbl td:nth-child(4) { width: 14% !important; }
+    .rtbl th:nth-child(5), .rtbl td:nth-child(5) { width: 20% !important; }
+    .name-cell,
+    .club-cell,
+    .time-cell {
+      font-size: 11px !important;
     }
     .pos-cell {
       min-width: 28px !important;

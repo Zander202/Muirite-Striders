@@ -934,6 +934,11 @@ footer{
   .results-panel{padding:24px;height:auto;overflow:visible;}
 }
 @media(max-width:768px){
+  .topbar{height:auto;min-height:64px;padding:10px 16px;align-items:center;gap:10px;flex-wrap:wrap;}
+  .topbar-brand{min-width:0;gap:10px;}
+  .topbar-logo{font-size:18px;letter-spacing:1.5px;white-space:nowrap;}
+  .back-btn{padding:9px 12px;font-size:12px;letter-spacing:1px;white-space:nowrap;}
+  .topbar .admin-login-btn{padding:9px 12px;font-size:12px;letter-spacing:1px;white-space:nowrap;}
   nav{padding:0 24px;}
   .nl{display:none;}
   .ham{display:flex;}
@@ -952,6 +957,17 @@ footer{
   .training-upload-panel{grid-template-columns:1fr;padding:18px;}
   .strava-club-page{padding:92px 24px 32px;}
   .strava-frame-wrap{height:70vh;min-height:520px;}
+  .event-results-view{width:100%;overflow:hidden;}
+  .table-wrap{overflow-x:hidden;}
+  .rtbl{table-layout:fixed;width:100%;min-width:0;}
+  .rtbl th,.rtbl td{padding:9px 5px;font-size:11px;line-height:1.25;word-break:break-word;}
+  .rtbl th{font-size:10px;letter-spacing:.5px;}
+  .rtbl th:nth-child(1),.rtbl td:nth-child(1){width:12%;}
+  .rtbl th:nth-child(2),.rtbl td:nth-child(2){width:34%;}
+  .rtbl th:nth-child(3),.rtbl td:nth-child(3){width:20%;}
+  .rtbl th:nth-child(4),.rtbl td:nth-child(4){width:14%;}
+  .rtbl th:nth-child(5),.rtbl td:nth-child(5){width:20%;}
+  .pos-cell,.time-cell{font-size:11px;}
   
   /* Gallery Overrides */
   .main,.hero-strip{padding-left:24px;padding-right:24px;}
