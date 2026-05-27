@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results · Muirite Striders AC</title>
+  <link rel="icon" type="image/png" href="logo.jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">MUIRITE <em>/</em> STRIDERS</div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-title">EPA Results</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="admin-login-btn" id="adminNavBtn" onclick="window.handleAdminNavClick()">Admin</button>
+    <a href="index.html" class="back-btn">← Back to Home</a>
+  </div>
+</div>
+
+<!-- ADMIN UPLOAD PANEL — hidden until admin logs in -->
+<div class="upload-panel" id="uploadPanel" style="display:none;">
+  <span class="up-label">Upload Results</span>
+  <div class="up-sep"></div>
+  <input type="text" id="upRaceName" class="up-input" placeholder="Event Name (e.g. Heartbreak Hill 2026)" maxlength="80">
+  <select id="upDist" class="up-input">
+    <option value="56km">56km Ultra</option>
+    <option value="50km">50km Ultra</option>
+    <option value="42.2km">42.2km Marathon</option>
+    <option value="21.1km">21.1km Half</option>
+    <option value="15km">15km</option>
+    <option value="10km">10km</option>
+    <option value="5km">5km</option>
+    <option value="3km">3km Fun Run</option>
+  </select>
+  <label class="up-file-label">
+    <input type="file" id="upFile" accept=".pdf" onchange="window.onFileChange(this)">
+    <span id="upFileLbl">Choose PDF</span>
+  </label>
+  <button class="up-btn" onclick="window.doUpload()">Upload Data</button>
+  <button class="up-erase" onclick="window.eraseAll()">✕ Erase All</button>
+</div>
+
+<div class="main main-results">
+
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-head-lbl">Race Events</div>
+      <div class="sidebar-head-title">FIXTURES</div>
+      <div class="sidebar-count" id="eventCount">0 events uploaded</div>
+    </div>
+    <div class="event-list" id="eventList"></div>
+  </aside>
+
+  <div class="results-panel" id="resultsPanel">
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🏁</div>
+      <div class="empty-title">No Results Yet</div>
+      <p class="empty-sub">Results will appear here once they are uploaded. Use the search box to find an athlete by name.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-bg" id="adminModalBg" onclick="if(event.target===this)window.closeAdminModal()">
+  <div class="modal">
+    <h3>Admin Access</h3>
+    <p style="font-family:'Barlow',sans-serif;font-size:15px;color:var(--mu2);margin-bottom:24px;font-weight:500;line-height:1.6;">Enter the admin password to unlock upload and management controls.</p>
+    <input type="password" id="adminPassInput" placeholder="Password" autocomplete="current-password">
+    <div id="adminLoginError" style="display:none;margin-top:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--danger);">Incorrect password. Try again.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="window.closeAdminModal()">Cancel</button>
+      <button class="modal-confirm" onclick="window.submitAdminLogin()">Login</button>
+    </div>
+  </div>
+</div>
+
+<div class="progress-overlay" id="progressOverlay">
+  <div class="progress-spinner"></div>
+  <div class="progress-text" id="progressText">Processing PDF…</div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script defer src="/_vercel/insights/script.js"></script>
+<script type="module" src="script.js"></script>
+</body>
+</html>

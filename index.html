@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muirite Striders AC</title>
+  <link rel="icon" type="image/png" href="logo.jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-left">
+    <div class="logo">MUIRITE <em>/</em> STRIDERS</div>
+    <button class="admin-login-btn" id="adminNavBtn" onclick="window.handleAdminNavClick()">Admin</button>
+  </div>
+  <div class="nl">
+    <a href="#hero">Home</a>
+    <a href="#races">Races</a>
+    <a href="#news">News</a>
+    <a href="results.html">Results</a>
+    <a href="#contact">Contact</a>
+    <a href="https://www.strava.com/clubs/muirite-striders" target="_blank" rel="noopener" data-strava-club>Strava</a>
+    <a href="gallery.html" class="gb">Gallery</a>
+  </div>
+  <div class="ham" onclick="window.tmm()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="mm" id="mm">
+  <a href="#hero" onclick="window.tmm()">Home</a>
+  <a href="#races" onclick="window.tmm()">Races</a>
+  <a href="#news" onclick="window.tmm()">News</a>
+  <a href="results.html" onclick="window.tmm()">Results</a>
+  <a href="gallery.html" onclick="window.tmm()">Gallery</a>
+  <a href="#contact" onclick="window.tmm()">Contact</a>
+  <a href="https://www.strava.com/clubs/muirite-striders" target="_blank" rel="noopener" data-strava-club onclick="window.tmm()">Strava</a>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-bg" id="adminModalBg" onclick="if(event.target===this)window.closeAdminModal()">
+  <div class="modal">
+    <h3>Admin Access</h3>
+    <p style="font-family:'Barlow',sans-serif;font-size:15px;color:var(--mu2);margin-bottom:24px;font-weight:500;line-height:1.6;">Enter the admin password to unlock upload and management controls across the site.</p>
+    <input type="password" id="adminPassInput" placeholder="Password" autocomplete="current-password">
+    <div id="adminLoginError" style="display:none;margin-top:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--danger);">Incorrect password. Try again.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="window.closeAdminModal()">Cancel</button>
+      <button class="modal-confirm" onclick="window.submitAdminLogin()">Login</button>
+    </div>
+  </div>
+</div>
+
+<section id="hero">
+  <div class="hbg" id="hbg"></div>
+  <div class="hov"></div>
+  <div class="hc">
+    <div class="hl">Eastern Province Athletics</div>
+    <h1 class="ht">MUIRITE<span>STRIDERS</span></h1>
+    <div class="hr"></div>
+    <div class="htag">Heart. Pride. Endurance.</div>
+    <div class="hcta">
+      <a href="#races" class="btn bw">Race Calendar</a>
+      <a href="results.html" class="btn bg">Latest Results</a>
+    </div>
+  </div>
+  <div class="hscr"><div class="hscrl"></div>Scroll</div>
+</section>
+
+<section id="carousel">
+  <div class="cw">
+    <div class="ct carousel-loading" id="ct">
+      <div class="cs">
+        <img src="race1.png" alt="Race Day">
+        <div class="cg"></div>
+        <div class="cc"><h3>Race Day Focus</h3><p>Muirite Striders on the road</p></div>
+      </div>
+      <div class="cs">
+        <img src="pix.png" alt="Finish Line">
+        <div class="cg"></div>
+        <div class="cc"><h3>Crossing The Line</h3><p>Every finish is a victory</p></div>
+      </div>
+      <div class="cs">
+        <img src="tt.png" alt="Club Spirit">
+        <div class="cg"></div>
+        <div class="cc"><h3>Club Spirit</h3><p>Stronger together in Blue &amp; Red</p></div>
+      </div>
+      <div class="cs">
+        <img src="friends.png" alt="Trails">
+        <div class="cg"></div>
+        <div class="cc"><h3>On The Route</h3><p>Eastern Province's finest roads</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="cn">
+    <div class="cdots" id="cdots"></div>
+    <div class="cbtns">
+      <button class="cb" onclick="window.cp()">&#8592;</button>
+      <button class="cb" onclick="window.cn2()">&#8594;</button>
+    </div>
+  </div>
+  <div class="carousel-admin-panel admin-only" id="carouselAdminPanel" style="display:none;">
+    <div class="carousel-admin-head">
+      <div>
+        <div class="sh-lbl">Homepage Slides</div>
+        <div class="carousel-admin-title">Carousel Photos</div>
+      </div>
+      <label class="carousel-add-btn">
+        Add Photo
+        <input type="file" accept="image/*" multiple onchange="window.addCarouselPhotos(event)">
+      </label>
+    </div>
+    <div class="carousel-admin-list" id="carouselAdminList"></div>
+  </div>
+</section>
+
+<section id="news">
+  <div class="sh" style="margin-bottom:36px;">
+    <div class="sh-lbl">Club Updates</div>
+    <div class="sh-t">NEWS</div>
+    <div class="sh-ln"></div>
+  </div>
+
+  <div class="training-upload-panel admin-only" id="trainingUploadPanel" style="display:none;">
+    <input type="text" id="trainingTitle" placeholder="Training run title">
+    <input type="date" id="trainingDate">
+    <input type="text" id="trainingLocation" placeholder="Location">
+    <textarea id="trainingNotes" placeholder="Short note for everyone"></textarea>
+    <label class="training-file-btn">
+      Choose Photo
+      <input type="file" id="trainingPhotoInput" accept="image/*" onchange="window.handleTrainingPhotoPick(event)">
+    </label>
+    <div class="training-file-name" id="trainingPhotoName">No photo selected</div>
+    <button type="button" class="training-post-btn" onclick="window.uploadTrainingRun()">Post Training Run</button>
+  </div>
+
+  <div class="training-grid" id="trainingGrid"></div>
+</section>
+
+<section id="races">
+  <div class="sh" style="margin-bottom:48px;">
+    <div class="sh-lbl">South Africa's Iconic Events</div>
+    <div class="sh-t">THE BIG THREE</div>
+    <div class="sh-ln"></div>
+  </div>
+  <div class="b3g" id="b3g"></div>
+
+  <div class="ep-div">
+    <div class="ep-div-line"></div>
+    <span>Eastern Province · 2026 Fixtures</span>
+    <div class="ep-div-line"></div>
+  </div>
+
+  <div class="rf">
+    <button class="flt active" onclick="window.fr('all',this)">All Events</button>
+    <button class="flt" onclick="window.fr('road',this)">5k / 10k</button>
+    <button class="flt" onclick="window.fr('half',this)">Half Marathons</button>
+    <button class="flt" onclick="window.fr('marathon',this)">Marathons &amp; Ultras</button>
+  </div>
+  <div class="rg" id="rg"></div>
+  <div class="rm"><a href="https://runningcalendar.co.za/races/calendar/province/eastern-cape" target="_blank" class="btn bw" style="display:inline-block;margin-top:32px;">View Full EP Calendar ↗</a></div>
+</section>
+
+<section id="contact">
+  <div class="sh" style="margin-bottom:36px;"><div class="sh-lbl">Get In Touch</div><div class="sh-t">CONTACT</div><div class="sh-ln"></div></div>
+  <div class="cg2">
+    <div class="cc2">
+      <h3>THE CLUB</h3>
+      <p>About Us
+
+Muirite Striders Running Club is a dynamic running community in Uitenhage where passion for running and community come together. We welcome runners and walkers of all ages and fitness levels — from beginners to experienced athletes.
+
+Our focus is to motivate one another, promote healthy living, and achieve goals together in a friendly and supportive environment. At Muirite Striders, it’s not just about running — it’s about teamwork, discipline, and community spirit.
+
+One Stride. One Team. One Community. </p>
+    </div>
+    <div class="cc2">
+      <h3>CHAIRPERSON</h3>
+      <p>Questions about membership, club colors, or events? Send a WhatsApp to the chairperson and we'll get back to you.</p>
+      <a href="https://wa.me/27824962926?text=Hi%2C%20I%27m%20interested%20in%20Muirite%20Striders!" target="_blank" class="bwa">&#x2B; WhatsApp Us</a>
+      <a href="strava.html" class="strava-btn" data-strava-club>STRAVA CLUB</a>
+    </div>
+  </div>
+</section>
+
+<div class="strava-modal" id="stravaModal" aria-hidden="true">
+  <div class="strava-modal-box">
+    <div class="strava-modal-head">
+      <div>
+        <div class="sh-lbl">Club Activity</div>
+        <div class="strava-modal-title">MUIRITE STRIDERS ON STRAVA</div>
+      </div>
+      <button type="button" class="strava-modal-close" onclick="window.closeStravaStats()">Close</button>
+    </div>
+    <iframe id="stravaFrame" title="Muirite Striders Strava club activity" loading="lazy"></iframe>
+    <a href="https://www.strava.com/clubs/1356667?oq=M" target="_blank" rel="noopener" class="strava-open" data-strava-club>Open on Strava</a>
+  </div>
+</div>
+
+<footer>
+  <div class="fl">MUIRITE / STRIDERS</div>
+  <div class="ft">© 2026 Muirite Striders AC · Eastern Province</div>
+  <div class="fls">
+    <a href="https://www.strava.com/clubs/1356667?oq=M" target="_blank" rel="noopener" data-strava-club>Strava</a>
+    <a href="#hero">↑ Top</a>
+  </div>
+</footer>
+
+<a href="https://wa.me/27824962926?text=Hi%2C%20I%27m%20interested%20in%20Muirite%20Striders!" target="_blank" class="wf" title="WhatsApp us">💬</a>
+<a href="https://www.facebook.com/groups/1440115282961954" target="_blank" rel="noopener" class="wf fb" title="Facebook">f</a>
+<script defer src="/_vercel/insights/script.js"></script>
+<script type="module" src="script.js"></script>
+</body>
+</html>

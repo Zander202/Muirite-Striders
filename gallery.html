@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery · Muirite Striders AC</title>
+  <link rel="icon" type="image/png" href="logo.jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">MUIRITE <em>/</em> STRIDERS</div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-title">Gallery</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="admin-login-btn" id="adminNavBtn" onclick="window.handleAdminNavClick()">Admin</button>
+    <a href="index.html" class="back-btn">← Back to Home</a>
+  </div>
+</div>
+
+<!-- HERO STRIP -->
+<div class="hero-strip">
+  <div class="hero-lbl">Photo Albums</div>
+  <div class="hero-title">CLUB GALLERY</div>
+  <div class="hero-sub">Race days, training runs, and club memories — Eastern Province Athletics</div>
+  <div class="hero-actions">
+    <!-- Admin-only: New Album button — shown/hidden via JS -->
+    <button class="new-album-btn admin-only" id="newAlbumBtn" onclick="window.openModal()" style="display:none;">＋ New Album</button>
+    <span class="album-count-badge" id="albumBadge">0 albums</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="search-row">
+    <div class="search-wrap">
+      <span class="search-ic"></span>
+      <input type="text" id="albumSearch" placeholder="Search albums…" oninput="window.renderAlbums()">
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="window.renderAlbums()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="name">A–Z</option>
+    </select>
+  </div>
+  <div class="albums-grid" id="albumsGrid"></div>
+</div>
+
+<!-- LIGHTBOX (album view) -->
+<div class="lightbox" id="lightbox">
+  <div class="lb-head">
+    <div class="lb-left">
+      <button class="lb-back" onclick="window.closeLightbox()">←</button>
+      <div>
+        <div class="lb-name" id="lbName">Album</div>
+        <div class="lb-count" id="lbCount">0 photos</div>
+      </div>
+    </div>
+    <div class="lb-actions">
+      <!-- Admin-only: Add Photos button -->
+      <button class="lb-add-btn admin-only" id="lbAddBtn" onclick="document.getElementById('photoInput').click()" style="display:none;">+ Add Photos</button>
+      <button class="lb-close" onclick="window.closeLightbox()">✕</button>
+    </div>
+  </div>
+  <div class="lb-body">
+    <div class="lb-photos-grid" id="photosGrid"></div>
+    <div class="lb-empty" id="lbEmpty" style="display:none">No photos in this album yet.</div>
+  </div>
+</div>
+<input type="file" id="photoInput" accept="image/*" multiple onchange="window.addPhotos(event)" style="display:none">
+
+<!-- PHOTO VIEWER -->
+<div class="viewer" id="viewer">
+  <span class="viewer-counter" id="viewerCounter"></span>
+  <button class="viewer-close" onclick="window.closeViewer()">✕</button>
+  <button class="viewer-prev" onclick="window.viewerNav(-1)">←</button>
+  <img id="viewerImg" src="" alt="">
+  <button class="viewer-next" onclick="window.viewerNav(1)">→</button>
+  <button class="viewer-dl" onclick="window.downloadCurrent()">↓ Download</button>
+</div>
+
+<!-- NEW ALBUM MODAL (admin only) -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)window.closeModal()">
+  <div class="modal">
+    <h3>New Album</h3>
+    <input type="text" id="albumNameInput" placeholder="e.g. Heartbreak Hill 2026" maxlength="60">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="window.closeModal()">Cancel</button>
+      <button class="modal-confirm" onclick="window.createAlbum()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-bg" id="adminModalBg" onclick="if(event.target===this)window.closeAdminModal()">
+  <div class="modal">
+    <h3>Admin Access</h3>
+    <p style="font-family:'Barlow',sans-serif;font-size:15px;color:var(--mu2);margin-bottom:24px;font-weight:500;line-height:1.6;">Enter the admin password to unlock upload and management controls.</p>
+    <input type="password" id="adminPassInput" placeholder="Password" autocomplete="current-password">
+    <div id="adminLoginError" style="display:none;margin-top:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--danger);">Incorrect password. Try again.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="window.closeAdminModal()">Cancel</button>
+      <button class="modal-confirm" onclick="window.submitAdminLogin()">Login</button>
+    </div>
+  </div>
+</div>
+<script defer src="/_vercel/insights/script.js"></script>
+<script type="module" src="script.js"></script>
+</body>
+</html>
