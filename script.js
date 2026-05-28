@@ -948,6 +948,22 @@ window.toggleEpaRaces = function() {
   rr(currentRaceFilter);
 };
 
+window.toggleSocialFloat = function(event) {
+  event?.stopPropagation();
+  const social = document.getElementById('socialFloat');
+  const toggle = social?.querySelector('.social-toggle');
+  if (!social || !toggle) return;
+  const isOpen = social.classList.toggle('open');
+  toggle.setAttribute('aria-expanded', String(isOpen));
+};
+
+document.addEventListener('click', (event) => {
+  const social = document.getElementById('socialFloat');
+  if (!social || social.contains(event.target)) return;
+  social.classList.remove('open');
+  social.querySelector('.social-toggle')?.setAttribute('aria-expanded', 'false');
+});
+
 window.uploadEpaRacePhoto = async function(key, event) {
   if (!window.isAdmin()) return;
   const file = event?.target?.files?.[0];
@@ -2083,7 +2099,6 @@ document.addEventListener('DOMContentLoaded', () => {
 //
 //  Done â€” password is stored as SHA-256 hash, never as plaintext.
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
 
 
 
