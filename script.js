@@ -1,5 +1,5 @@
-
-// SECURITY SAFEGUARD 
+﻿
+// SECURITY SAFEGUARD
 window.es = window.es || function(t) {
   if (!t) return '';
   const d = document.createElement('div');
@@ -12,7 +12,7 @@ if (typeof pdfjsLib !== 'undefined') {
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
-//  SUPABASE CLIENT 
+//  SUPABASE CLIENT
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabase = createClient(
@@ -49,7 +49,7 @@ async function getStoredHash() {
   return null;
 }
 
-// One-time setup function â€” call from console to set/change password
+// One-time setup function  call from console to set/change password
 window.setupAdminPassword = async function(plainPassword) {
   if (!plainPassword || plainPassword.length < 6) {
     console.log('Password must be at least 6 characters.');
@@ -172,11 +172,11 @@ function injectMobileStyles() {
   style.id = 'msc-mobile-styles';
   style.textContent = `
 
-  /* â”€â”€ GLOBAL MOBILE TOUCH TARGETS â”€â”€ */
+  /*  GLOBAL MOBILE TOUCH TARGETS */
   @media (max-width: 768px) {
     * { -webkit-tap-highlight-color: transparent; }
 
-    /* â”€â”€ ADMIN MODAL â”€â”€ */
+ /*  ADMIN MODAL */
     #adminModalBg {
       padding: 0 !important;
       align-items: flex-end !important;
@@ -203,7 +203,7 @@ function injectMobileStyles() {
       width: 100% !important;
     }
 
-    /* â”€â”€ RESULTS LAYOUT â”€â”€ */
+ /*  RESULTS LAYOUT */
     .results-layout,
     #resultsContainer,
     .results-wrap {
@@ -237,7 +237,7 @@ function injectMobileStyles() {
       overflow: visible !important;
     }
 
-    /* â”€â”€ EVENT CARDS (sidebar) â”€â”€ */
+ /*  EVENT CARDS (sidebar) */
     .event-card {
       padding: 12px 14px !important;
       border-radius: 12px !important;
@@ -254,7 +254,7 @@ function injectMobileStyles() {
       padding: 2px 7px !important;
     }
 
-    /* â”€â”€ UPLOAD PANEL â”€â”€ */
+ /*  UPLOAD PANEL */
     #uploadPanel {
       flex-direction: column !important;
       align-items: stretch !important;
@@ -273,7 +273,7 @@ function injectMobileStyles() {
       box-sizing: border-box !important;
     }
 
-    /* â”€â”€ EVENT RESULTS VIEW â”€â”€ */
+ /*  EVENT RESULTS VIEW */
     .event-header {
       padding: 16px !important;
       flex-direction: column !important;
@@ -287,7 +287,7 @@ function injectMobileStyles() {
       font-size: 11px !important;
     }
 
-    /* â”€â”€ DISTANCE TABS â”€â”€ */
+ /*  DISTANCE TABS */
     .dist-tabs {
       overflow-x: auto !important;
       flex-wrap: nowrap !important;
@@ -305,7 +305,7 @@ function injectMobileStyles() {
       border-radius: 8px !important;
     }
 
-    /* â”€â”€ SEARCH + CONTROLS â”€â”€ */
+ /*  SEARCH + CONTROLS */
     .controls {
       flex-direction: column !important;
       gap: 10px !important;
@@ -327,7 +327,7 @@ function injectMobileStyles() {
       font-size: 11px !important;
     }
 
-    /* â”€â”€ RESULTS TABLE â”€â”€ */
+ /*  RESULTS TABLE */
     .table-wrap {
       overflow-x: hidden !important;
       -webkit-overflow-scrolling: touch !important;
@@ -380,7 +380,7 @@ function injectMobileStyles() {
       white-space: nowrap !important;
     }
 
-    /* â”€â”€ ALBUM / GALLERY GRID â”€â”€ */
+ /*  ALBUM / GALLERY GRID */
     #albumsGrid {
       grid-template-columns: 1fr 1fr !important;
       gap: 10px !important;
@@ -401,7 +401,7 @@ function injectMobileStyles() {
     }
   }
 
-  /* â”€â”€ VERY SMALL SCREENS â”€â”€ */
+  /*  VERY SMALL SCREENS */
   @media (max-width: 380px) {
     #albumsGrid {
       grid-template-columns: 1fr !important;
@@ -608,7 +608,7 @@ window.deleteCarouselPhoto = async function(id, imageUrl) {
 };
 
 
-//  BIG THREE â€” WITH ACTUAL RACE PHOTOS
+//  BIG THREE  WITH ACTUAL RACE PHOTOS
 
 
 const big3 = [
@@ -1076,7 +1076,7 @@ window.renderTrainingRuns = async function() {
   grid.innerHTML = albums.map(album => {
     const run = decodeTrainingAlbumName(album.name);
     const photo = firstPhotoByAlbum.get(album.id);
-    const img = photo?.image_url || 'logo.jpeg';
+    const img = photo?.image_url || 'logo.JPG';
     const removeBtn = admin
       ? `<button type="button" class="training-remove" onclick="window.deleteTrainingRun('${album.id}', '${photo?.image_url || ''}')">Remove</button>`
       : '';
@@ -1386,12 +1386,32 @@ window.deletePhoto = async function(id, imageUrl) {
   await renderPhotos();
   window.renderAlbums();
 };
+function isMobileDownloadTarget() {
+  const ua = navigator.userAgent || '';
+  const touchMac = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || touchMac;
+}
+function openDownloadUrl(url) {
+  const opened = window.open(url, '_blank', 'noopener');
+  if (!opened) window.location.href = url;
+}
 window.downloadPhoto = async function(url, name) {
   const fileName = name || 'photo.jpg';
   try {
     const res = await fetch(url, { mode: 'cors', cache: 'force-cache' });
     if (!res.ok) throw new Error('Download request failed');
     const blob = await res.blob();
+    const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+    if (isMobileDownloadTarget()) {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: fileName });
+        return;
+      }
+      const mobileUrl = URL.createObjectURL(blob);
+      openDownloadUrl(mobileUrl);
+      setTimeout(() => URL.revokeObjectURL(mobileUrl), 60000);
+      return;
+    }
     const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = objectUrl;
@@ -1400,15 +1420,9 @@ window.downloadPhoto = async function(url, name) {
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-  } catch {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  } catch (err) {
+    if (err?.name === 'AbortError') return;
+    openDownloadUrl(url);
   }
 };
 function openViewer(i, photos) {
@@ -1832,14 +1846,14 @@ window.doUpload = async function() {
 };
 
 
-//  PDF RESULTS PARSER â€” FULL EP CLUB DICTIONARY
+//  PDF RESULTS PARSER  FULL EP CLUB DICTIONARY
 
 function parseResultsPDF(rawText, distance) {
 
   // COMPLETE EP CLUB DICTIONARY
   // Ordered longest-first so multi-word names match before sub-strings.
   const CLUBS = [
-    // Multi-word / full names first
+ // Multi-word / full names first
     'PEA AC', 'NEDBANK RC', 'ELITEAC', 'ELITE AC',
     'RUN4COMMUNITY', 'RUN 4 COMMUNITY', 'RUN 4 CHRIST', 'RUN4CHRIST',
     'TEAM VITALITY', 'TEAMVITALITY',
@@ -1850,7 +1864,7 @@ function parseResultsPDF(rawText, distance) {
     'ACT AC', 'UCT AC', 'CAPE AC',
     'NEW BRIGHTON', 'ST FRANCIS',
     'OLD MUTUAL', 'STANDARD BANK',
-    // Abbreviations & short codes â€” alphabetical within group
+ // Abbreviations & short codes  alphabetical within group
     '32GI',
     'ABSA', 'ABSAEP',
     'ACH', 'ACT', 'ADVEN', 'ALBANY', 'ASICS', 'ASPEN', 'ATLANTIC',
@@ -1880,7 +1894,7 @@ function parseResultsPDF(rawText, distance) {
     'UNATTACHED',
   ];
 
-  // CATEGORY TOKENS 
+  // CATEGORY TOKENS
   const CAT_SET = new Set([
     'SM','SF','JM','JF','OM','OF','VM','VF','M','F',
     'OPEN','MEN','WOMEN','SENIOR','JUNIOR','VETERAN','MASTERS',
@@ -1891,7 +1905,7 @@ function parseResultsPDF(rawText, distance) {
     'V40','V45','V50','V55','V60','V65','V70',
   ]);
 
-  //  REGEX PATTERNS 
+  //  REGEX PATTERNS
   const TIME_RX = /\b(\d{1,2})[:.h](\d{2})(?:[:.m](\d{2}))?\b/;
   const POS_RX  = /^([HhWwMm]?)(\d{1,4})\.?$/;
   const LIC_RX  = /^\d{5,}$/;
@@ -1908,7 +1922,7 @@ function parseResultsPDF(rawText, distance) {
     return raw.replace(/\./g, ':').replace(/h/gi, ':');
   }
 
-  //  MAIN PARSE 
+  //  MAIN PARSE
   const lines    = rawText.split('\n');
   const athletes = [];
 
@@ -1930,7 +1944,7 @@ function parseResultsPDF(rawText, distance) {
     if (SKIP_WORDS.has(upperLine.split(/\s+/)[0])) return;
     if (upperLine.includes('GALAXY BINGO') || upperLine.match(/^PAGE\s+\d/)) return;
 
-    // Must contain a time
+ // Must contain a time
     const timeMatch = cleanLine.match(TIME_RX);
     if (!timeMatch) return;
     const finishTime = normaliseTime(timeMatch[0]);
@@ -1943,7 +1957,7 @@ function parseResultsPDF(rawText, distance) {
     let clubName     = 'Unattached';
     let nameTokens   = [];
 
-    // Step 1 position from first token
+ // Step 1 position from first token
     if (tokens.length > 0) {
       const posM = tokens[0].match(POS_RX);
       if (posM && !LIC_RX.test(tokens[0])) {
@@ -1952,10 +1966,10 @@ function parseResultsPDF(rawText, distance) {
       }
     }
 
-    // Step 2 âremove licence/bib numbers
+ // Step 2 remove licence/bib numbers
     const cleaned = tokens.filter(t => !LIC_RX.test(t));
 
-    // Step 3  detect club (multi-word aware, longest first)
+ // Step 3  detect club (multi-word aware, longest first)
     const joinedUpper = cleaned.map(t => t.toUpperCase()).join(' ');
     let clubMatch = null;
     for (const club of CLUBS) {
@@ -1963,7 +1977,7 @@ function parseResultsPDF(rawText, distance) {
     }
     if (clubMatch) clubName = clubMatch;
 
-    // Step 4 detect category token
+ // Step 4 detect category token
     let catFound = '';
     const afterClubRemoval = cleaned.filter(t => {
       const u = t.toUpperCase();
@@ -1977,7 +1991,7 @@ function parseResultsPDF(rawText, distance) {
     });
     if (catFound) category = catFound;
 
-    // Step 5 ” remaining tokens are the name
+ // Step 5  remaining tokens are the name
     nameTokens = afterClubRemoval.filter(t => {
       const u = t.toUpperCase();
       if (SKIP_WORDS.has(u)) return false;
@@ -2051,7 +2065,7 @@ document.addEventListener('keydown', e => {
 });
 
 
-//  DOM CONTENT LOADED â€” INIT EVERYTHING
+//  DOM CONTENT LOADED  INIT EVERYTHING
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2078,8 +2092,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
-
-
-
-

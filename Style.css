@@ -43,10 +43,8 @@ nav{
 }
 nav.scrolled{height:60px; box-shadow: 0 4px 20px rgba(0,71,171,0.06);}
 .logo{
-  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;
-  color:var(--accent);
+  display:flex;align-items:center;
 }
-.logo em{color:var(--danger);font-style:normal;margin:0 6px;}
 .nl{display:flex;align-items:center;gap:6px;}
 .nl a{
   padding:8px 16px;border-radius:4px;
@@ -84,8 +82,7 @@ nav.scrolled{height:60px; box-shadow: 0 4px 20px rgba(0,71,171,0.06);}
   padding:0 48px;height:64px;
 }
 .topbar-brand{display:flex;align-items:center;gap:16px;}
-.topbar-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--accent);}
-.topbar-logo em{color:var(--danger);font-style:normal;margin:0 5px;}
+.topbar-logo{display:flex;align-items:center;}
 .topbar-divider{width:1px;height:24px;background:var(--b);}
 .topbar-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--mu2);}
 .back-btn{
@@ -896,7 +893,7 @@ footer{
 @media(max-width:768px){
   .topbar{height:auto;min-height:64px;padding:10px 16px;align-items:center;gap:10px;flex-wrap:wrap;}
   .topbar-brand{min-width:0;gap:10px;}
-  .topbar-logo{font-size:18px;letter-spacing:1.5px;white-space:nowrap;}
+  .topbar-logo{white-space:nowrap;}
   .back-btn{padding:9px 12px;font-size:12px;letter-spacing:1px;white-space:nowrap;}
   .topbar .admin-login-btn{padding:9px 12px;font-size:12px;letter-spacing:1px;white-space:nowrap;}
   nav{padding:0 24px;}
@@ -953,15 +950,19 @@ footer{
 }
 
 .brand-logo {
-  height: 40px;      
-  width: auto;       
-  display: block;
-}
-
-.brand-logo {
-  height: 40px;
+  height: 46px;
   width: auto;
   display: block;
+  object-fit: contain;
+}
+
+.topbar .brand-logo {
+  height: 42px;
+}
+
+@media(max-width:768px){
+  .brand-logo{height:40px;}
+  .topbar .brand-logo{height:38px;}
 }
 
 
