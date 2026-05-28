@@ -1651,7 +1651,9 @@ function renderResultsTable() {
   const race = ev.races.find(r => r.distance === activeDist);
   if (!race || !race.athletes) { wrap.innerHTML = ''; return; }
   const q        = (document.getElementById('searchInput')?.value || '').toLowerCase();
-  const orderedAthletes = [...race.athletes].sort((a, b) => (parseInt(a.pos) || 999999) - (parseInt(b.pos) || 999999));
+  const orderedAthletes = [...race.athletes]
+    .sort((a, b) => (parseInt(a.pos) || 999999) - (parseInt(b.pos) || 999999))
+    .map((a, i) => ({ ...a, displayPos: parseInt(a.pos) || i + 1 }));
   const filtered = orderedAthletes.filter(a => [a.name, a.club, a.cat, a.time].some(v => String(v || '').toLowerCase().includes(q)));
   const countEl  = document.getElementById('resultsCount');
   if (countEl) countEl.textContent = `Showing ${filtered.length} of ${race.athletes.length}`;
@@ -1672,9 +1674,9 @@ function renderResultsTable() {
           <tr><th>Pos</th><th>Athlete</th><th>Club</th><th>Cat</th><th>Time</th></tr>
         </thead>
         <tbody>
-          ${filtered.length ? filtered.map((a, i) => `
+          ${filtered.length ? filtered.map(a => `
             <tr>
-              <td><span class="pos-cell ${posClass(i + 1)}">${window.es(String(i + 1))}</span></td>
+              <td><span class="pos-cell ${posClass(a.displayPos)}">${window.es(String(a.displayPos))}</span></td>
               <td class="name-cell">${hlName(a.name, q)}</td>
               <td class="club-cell">${window.es(a.club)}</td>
               <td>${window.es(a.cat)}</td>
@@ -2085,21 +2087,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-//  SUPABASE SETUP REMINDER (run in console once):
-//
-//  1. Create table in Supabase:
-//     Table name: admin_config
-//     Columns: id (int8, pk, auto), key (text, unique), value (text)
-//     RLS: Enable row level security â†’ allow SELECT for anon, nothing else
-//
-//  2. Set your admin password (run once in browser console):
-//     window.setupAdminPassword('YourChosenPassword')
-//
-//  Done â€” password is stored as SHA-256 hash, never as plaintext.
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
 
 
 
