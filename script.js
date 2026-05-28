@@ -1,4 +1,4 @@
-﻿// =======================================================
+// =======================================================
 //  MUIRITE STRIDERS â€” Unified Global JS Â· Admin Edition
 //  v2.0 â€” Supabase Â· SHA-256 Hashed Auth Â· Full EP Calendar
 //  Mobile-Optimised Â· All EP Clubs Â· Auto-Expiry Races
@@ -36,8 +36,6 @@ window.supabase = supabase;
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const ADMIN_SESSION_KEY = 'msc_admin_session';
-const STRAVA_CLUB_URL = 'https://www.strava.com/clubs/1356667?oq=M';
-const STRAVA_CLUB_PAGE_URL = 'strava.html';
 const CAROUSEL_ALBUM_NAME = 'Homepage Carousel';
 let _cachedHash = null; // in-memory cache only, never logged
 
@@ -623,20 +621,6 @@ window.deleteCarouselPhoto = async function(id, imageUrl) {
   renderCarouselSlides(uploadedSlides.length ? uploadedSlides : carouselFallbackSlides);
   renderCarouselManager();
   toast('Carousel photo removed.', 'info');
-};
-
-window.openStravaStats = function(event) {
-  if (event) event.preventDefault();
-  window.location.href = STRAVA_CLUB_PAGE_URL;
-};
-
-window.closeStravaStats = function() {
-  const modal = document.getElementById('stravaModal');
-  if (modal) {
-    modal.classList.remove('open');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
 };
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -2068,11 +2052,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Restore admin state from sessionStorage
   applyAdminState();
-
-  document.querySelectorAll('[data-strava-club]').forEach(link => {
-    link.href = STRAVA_CLUB_PAGE_URL;
-  });
-  document.querySelector('.strava-btn')?.addEventListener('click', window.openStravaStats);
 
   // Kick off page-specific renders
   if (document.getElementById('b3g'))        renderBig3();

@@ -847,54 +847,6 @@ nav.scrolled{height:60px; box-shadow: 0 4px 20px rgba(0,71,171,0.06);}
   transition:all .2s;cursor:pointer; box-shadow:0 6px 15px rgba(37,211,102,0.15);
 }
 .bwa:hover{background:var(--wa);color:#fff; transform:translateY(-3px); box-shadow:0 10px 20px rgba(37,211,102,0.25);}
-.strava-btn{
-  display:inline-flex;align-items:center;gap:10px; margin-top:28px;margin-left:10px;padding:14px 32px;border-radius:4px;
-  background:#fc4c02;border:2px solid #fc4c02; color:#fff;
-  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  transition:all .2s;cursor:pointer; box-shadow:0 6px 15px rgba(252,76,2,0.18);
-}
-.strava-btn:hover{background:#d84202;border-color:#d84202;color:#fff; transform:translateY(-3px); box-shadow:0 10px 20px rgba(252,76,2,0.25);}
-.strava-modal{
-  display:none;position:fixed;inset:0;z-index:4500;background:rgba(0,15,30,.74);backdrop-filter:blur(8px);
-  align-items:center;justify-content:center;padding:24px;
-}
-.strava-modal.open{display:flex;}
-.strava-modal-box{
-  width:min(1080px,96vw);height:min(760px,90vh);background:#fff;border-radius:8px;border:1px solid var(--b);
-  box-shadow:0 28px 70px rgba(0,0,0,.32);display:flex;flex-direction:column;overflow:hidden;
-}
-.strava-modal-head{
-  height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;border-bottom:1px solid var(--b);
-}
-.strava-modal-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1.5px;color:var(--w);}
-.strava-modal-close,.strava-open{
-  border:2px solid #fc4c02;background:#fc4c02;color:#fff;border-radius:4px;padding:10px 18px;
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
-}
-.strava-modal-close:hover,.strava-open:hover{background:#d84202;border-color:#d84202;}
-#stravaFrame{flex:1;width:100%;border:0;background:#f7f8fa;}
-.strava-open{margin:14px 24px 20px;align-self:flex-start;}
-.strava-page{background:var(--bg);min-height:100vh;}
-.strava-club-page{padding:112px 52px 52px;}
-.strava-club-head{
-  max-width:1180px;margin:0 auto 24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;
-}
-.strava-club-head h1{
-  font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,7vw,92px);letter-spacing:2px;color:var(--w);line-height:.9;margin:8px 0 0;
-}
-.strava-open-main{
-  display:inline-flex;align-items:center;justify-content:center;padding:14px 24px;border-radius:4px;
-  background:#fc4c02;border:2px solid #fc4c02;color:#fff;
-  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  transition:.2s;box-shadow:0 8px 18px rgba(252,76,2,.18);
-}
-.strava-open-main:hover{background:#d84202;border-color:#d84202;transform:translateY(-2px);}
-.strava-frame-wrap{
-  max-width:1180px;height:calc(100vh - 230px);min-height:620px;margin:0 auto;background:#fff;border:1px solid var(--b);
-  border-radius:8px;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.08);
-}
-.strava-frame-wrap iframe{width:100%;height:100%;border:0;background:#fff;}
-
 /* ── FOOTER ──────────────────────────────────── */
 footer{
   padding:40px 52px; display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;
@@ -918,6 +870,11 @@ footer{
   font-family:Arial,sans-serif;font-weight:800;font-size:32px;
 }
 .wf.fb:hover{box-shadow:0 12px 28px rgba(24,119,242,0.45);}
+.wf.strava-float{
+  right:170px;background:#fc4c02;box-shadow:0 8px 20px rgba(252,76,2,0.35);
+}
+.wf.strava-float svg{width:36px;height:36px;fill:#fff;display:block;}
+.wf.strava-float:hover{box-shadow:0 12px 28px rgba(252,76,2,0.45);}
 
 
 /* ── RESPONSIVE MEDIA BLOCK ─────────────────── */
@@ -955,8 +912,6 @@ footer{
   .pdf-admin { flex-direction: column; align-items: stretch; padding:20px;}
   .pdf-admin input[type="text"] { min-width: 100%; }
   .training-upload-panel{grid-template-columns:1fr;padding:18px;}
-  .strava-club-page{padding:92px 24px 32px;}
-  .strava-frame-wrap{height:70vh;min-height:520px;}
   .event-results-view{width:100%;overflow:hidden;}
   .table-wrap{overflow-x:hidden;}
   .rtbl{table-layout:fixed;width:100%;min-width:0;}
