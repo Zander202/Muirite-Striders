@@ -653,11 +653,23 @@ const big3 = [
 function raceStatusFromDate(dateValue) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
   const date = new Date(`${dateValue}T00:00:00`);
   const days = Math.ceil((date - today) / 86400000);
-  if (days < 0) return { status: 'past', label: 'Completed' };
-  if (days <= 14) return { status: 'soon', label: days === 0 ? 'Today' : `${days} day${days === 1 ? '' : 's'} to go` };
-  return { status: 'upcoming', label: 'Upcoming' };
+
+  if (days < 0)
+    return { status: 'past', label: 'Completed' };
+
+  if (days <= 14)
+    return {
+      status: 'soon',
+      label: days === 0 ? 'Today' : `${days} day${days === 1 ? '' : 's'} to go`
+    };
+
+  return {
+    status: 'upcoming',
+    label: `${days} day${days === 1 ? '' : 's'} to go`
+  };
 }
 
 function renderBig3() {
