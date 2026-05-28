@@ -31,7 +31,7 @@
 <div class="topbar">
   <div class="topbar-brand">
     <a href="index.html" class="topbar-logo" aria-label="Muirite Striders home">
-      <img src="logo.JPG" alt="Muirite Striders" class="brand-logo">
+      <img src="logo.JPG" alt="Muirite Striders" class="brand-logo" onerror="this.onerror=null;this.src='logo.JPG'">
     </a>
     <div class="topbar-divider"></div>
     <div class="topbar-title">Gallery</div>
@@ -98,7 +98,7 @@
   <span class="viewer-counter" id="viewerCounter"></span>
   <button class="viewer-close" onclick="window.closeViewer()">✕</button>
   <button class="viewer-prev" onclick="window.viewerNav(-1)">←</button>
-  <img id="viewerImg" src="" alt="">
+  <img id="viewerImg" src="" alt="" onerror="this.onerror=null;this.src='logo.JPG'">
   <button class="viewer-next" onclick="window.viewerNav(1)">→</button>
   <button class="viewer-dl" onclick="window.downloadCurrent()">↓ Download</button>
 </div>

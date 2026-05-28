@@ -7,6 +7,23 @@ window.es = window.es || function(t) {
   return d.innerHTML;
 };
 
+const FALLBACK_IMAGE = 'logo.JPG';
+
+window.useImageFallback = function(img) {
+  if (!img || img.dataset.fallbackApplied === 'true') return;
+  img.dataset.fallbackApplied = 'true';
+  img.src = FALLBACK_IMAGE;
+  img.alt = img.alt || 'Muirite Striders';
+};
+
+function fallbackAttr() {
+  return ' onerror="window.useImageFallback(this)"';
+}
+
+document.addEventListener('error', event => {
+  if (event.target?.tagName === 'IMG') window.useImageFallback(event.target);
+}, true);
+
 if (typeof pdfjsLib !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -455,7 +472,7 @@ function renderCarouselSlides(slides) {
   const shuffled = shuffleList(slides);
   tr.innerHTML = shuffled.map(slide => `
     <div class="cs">
-      <img src="${window.es(slide.src)}" alt="${window.es(slide.title || 'Race photo')}">
+      <img src="${window.es(slide.src)}" alt="${window.es(slide.title || 'Race photo')}"${fallbackAttr()}>
     </div>`).join('');
   tr.classList.remove('carousel-loading');
   sl = shuffled.length;
@@ -532,7 +549,7 @@ function renderCarouselManager() {
   }
   list.innerHTML = carouselPhotos.map(photo => `
     <div class="carousel-admin-item">
-      <img src="${photo.image_url}" alt="Carousel photo" loading="lazy">
+      <img src="${photo.image_url}" alt="Carousel photo" loading="lazy"${fallbackAttr()}>
       <button type="button" onclick="window.deleteCarouselPhoto('${photo.id}', '${photo.image_url}')">Remove</button>
     </div>`).join('');
 }
@@ -681,10 +698,10 @@ function renderBig3() {
     const dotClass = state.status === 'soon' ? 'soon' : state.status === 'upcoming' ? 'upcoming' : 'past';
     return `<div class="b3c b3-${state.status}" data-num="${r.num}" onclick="window.open('${r.u}','_blank')">
       ${r.img ? `<div class="b3-img-wrap" style="position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit">
-        <img src="${r.img}" alt="${window.es(r.n)}" style="width:100%;height:100%;object-fit:cover;opacity:0.28;filter:saturate(1.1)">
+        <img src="${r.img}" alt="${window.es(r.n)}" style="width:100%;height:100%;object-fit:cover;opacity:0.28;filter:saturate(1.1)"${fallbackAttr()}>
         <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.6) 100%)"></div>
       </div>` : ''}
-      ${r.logo ? `<div class="b3-logo"><img src="${r.logo}" alt="${window.es(r.n)} logo" loading="lazy"></div>` : ''}
+      ${r.logo ? `<div class="b3-logo"><img src="${r.logo}" alt="${window.es(r.n)} logo" loading="lazy"${fallbackAttr()}></div>` : ''}
       <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%;">
         <div>
           <div class="b3badge ${statusClass}"><div class="b3-dot ${dotClass}"></div>${state.label}</div>
@@ -913,8 +930,8 @@ function rr(filter) {
         </label>
       </div>` : '';
     return `<div class="rc has-img">
-      <img class="rc-img" src="${r.img}" alt="${window.es(r.n)}" loading="lazy"><div class="rc-ov"></div>
-      ${r.logo ? `<div class="rc-logo"><img src="${r.logo}" alt="Eastern Province Athletics logo" loading="lazy"></div>` : ''}
+      <img class="rc-img" src="${r.img}" alt="${window.es(r.n)}" loading="lazy"${fallbackAttr()}><div class="rc-ov"></div>
+      ${r.logo ? `<div class="rc-logo"><img src="${r.logo}" alt="Eastern Province Athletics logo" loading="lazy"${fallbackAttr()}></div>` : ''}
       <div class="rc-body">
         <div class="rdr">
           <div class="rday">${r.d}</div>
@@ -1081,7 +1098,7 @@ window.renderTrainingRuns = async function() {
       ? `<button type="button" class="training-remove" onclick="window.deleteTrainingRun('${album.id}', '${photo?.image_url || ''}')">Remove</button>`
       : '';
     return `<article class="training-card">
-      <img src="${img}" alt="${window.es(run.title || 'Training run')}" loading="lazy">
+      <img src="${img}" alt="${window.es(run.title || 'Training run')}" loading="lazy"${fallbackAttr()}>
       <div class="training-card-body">
         <div class="training-date">${window.es(formatDisplayDate(run.date))}</div>
         <h3>${window.es(run.title || 'Training Run')}</h3>
@@ -1226,14 +1243,14 @@ window.renderAlbums = async function() {
     let thumbHtml;
     if (photos.length >= 4) {
       thumbHtml = `<div class="album-mosaic">
-        ${photos.slice(0, 4).map(p => `<img src="${p.image_url}" alt="">`).join('')}
+        ${photos.slice(0, 4).map(p => `<img src="${p.image_url}" alt=""${fallbackAttr()}>`).join('')}
         ${photos.length > 4 ? `<div class="mosaic-more">+${photos.length - 4}</div>` : ''}
         <div class="album-thumb-overlay"></div>
         <div class="album-open-label">Open Album</div>
       </div>`;
     } else if (photos.length > 0) {
       thumbHtml = `<div class="album-thumb">
-        <img src="${photos[0].image_url}" alt="">
+        <img src="${photos[0].image_url}" alt=""${fallbackAttr()}>
         <div class="album-thumb-overlay"></div>
         <div class="album-open-label">Open Album</div>
       </div>`;
@@ -1346,7 +1363,7 @@ async function renderPhotos() {
         ? `<button class="photo-btn dl"  onclick="event.stopPropagation();window.downloadPhoto('${photo.image_url}','${window.es(fileName)}')">Download</button>
            <button class="photo-btn del" onclick="event.stopPropagation();window.deletePhoto('${photo.id}','${photo.image_url}')">Remove</button>`
         : `<button class="photo-btn dl"  onclick="event.stopPropagation();window.downloadPhoto('${photo.image_url}','${window.es(fileName)}')">Download</button>`;
-      item.innerHTML = `<img src="${photo.image_url}" alt="${window.es(fileName)}"><div class="photo-actions">${adminActions}</div>`;
+      item.innerHTML = `<img src="${photo.image_url}" alt="${window.es(fileName)}"${fallbackAttr()}><div class="photo-actions">${adminActions}</div>`;
       item.querySelector('img').onclick = () => openViewer(i, photos);
       grid.appendChild(item);
     });
@@ -1435,7 +1452,10 @@ function showViewerPhoto() {
   const photo = viewerPhotos[viewerIndex];
   const img   = document.getElementById('viewerImg');
   const cnt   = document.getElementById('viewerCounter');
-  if (img) img.src = photo.image_url;
+  if (img) {
+    img.dataset.fallbackApplied = 'false';
+    img.src = photo.image_url;
+  }
   if (cnt) cnt.textContent = `${viewerIndex + 1} / ${viewerPhotos.length}`;
 }
 window.closeViewer  = function() { document.getElementById('viewer')?.classList.remove('open'); };
