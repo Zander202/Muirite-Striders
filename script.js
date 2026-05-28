@@ -1,10 +1,5 @@
-// =======================================================
-//  MUIRITE STRIDERS â€” Unified Global JS Â· Admin Edition
-//  v2.0 â€” Supabase Â· SHA-256 Hashed Auth Â· Full EP Calendar
-//  Mobile-Optimised Â· All EP Clubs Â· Auto-Expiry Races
-// =======================================================
 
-// â”€â”€ SECURITY SAFEGUARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// SECURITY SAFEGUARD 
 window.es = window.es || function(t) {
   if (!t) return '';
   const d = document.createElement('div');
@@ -17,7 +12,7 @@ if (typeof pdfjsLib !== 'undefined') {
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
-// â”€â”€ SUPABASE CLIENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  SUPABASE CLIENT 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabase = createClient(
@@ -25,15 +20,6 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhma3VkcHNxa3Vxc3Jkb3JjaG9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5Mjk3ODYsImV4cCI6MjA5NDUwNTc4Nn0.DS_6GQ6XUGU3SpsUm4xszh1WKuBMvJxzV8boWnTpI-Y'
 );
 window.supabase = supabase;
-
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  SECURE ADMIN AUTH â€” Password stored as SHA-256 hash
-//  in Supabase table: admin_config (key, value)
-//
-//  SETUP (run once from browser console):
-//    window.setupAdminPassword('YourNewPassword')
-//  This hashes and stores it in Supabase. Never stored plain.
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const ADMIN_SESSION_KEY = 'msc_admin_session';
 const CAROUSEL_ALBUM_NAME = 'Homepage Carousel';
@@ -178,9 +164,8 @@ function applyAdminState() {
   if (document.getElementById('trainingGrid')) window.renderTrainingRuns();
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  MOBILE-FIRST CSS INJECTION
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function injectMobileStyles() {
   const style = document.createElement('style');
@@ -429,17 +414,16 @@ function injectMobileStyles() {
   document.head.appendChild(style);
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  STATE
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 let raceResults  = [];
 let scrapedRaces = [];
 let cachedDots   = [];
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  NAV
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 
 window.tmm = function() {
   const m = document.getElementById('mm');
@@ -451,9 +435,9 @@ window.addEventListener('scroll', () => {
   if (nav) nav.classList.toggle('scrolled', window.scrollY > 60);
 });
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  CAROUSEL
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 
 let ci = 0, ct2;
 let sl = 4;
@@ -623,9 +607,9 @@ window.deleteCarouselPhoto = async function(id, imageUrl) {
   toast('Carousel photo removed.', 'info');
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  BIG THREE â€” WITH ACTUAL RACE PHOTOS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 
 const big3 = [
   {
@@ -711,7 +695,6 @@ function renderBig3() {
 //  Races auto-disappear once their date has passed.
 //  Update names/dates to match the official EP Athletics
 //  calendar each season.
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const RC_BASE = 'https://runningcalendar.co.za';
 const RACE_IMG = {
@@ -1163,7 +1146,6 @@ window.deleteTrainingRun = async function(albumId, imageUrl) {
   toast('Training run removed.', 'info');
 };
 //  GALLERY
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 let currentAlbumId = null;
 let viewerPhotos   = [];
@@ -1443,9 +1425,9 @@ window.downloadCurrent = function() {
   window.downloadPhoto(photo.image_url, decodeURIComponent(parts[parts.length - 1].replace(/^\d+_/, '')));
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  RESULTS ENGINE
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 
 let activeEvent = null;
 let activeDist  = null;
@@ -1745,9 +1727,9 @@ window.deleteDistFromEvent = async function(name, dist) {
   toast(`${dist} removed`, 'info');
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  PDF UPLOAD CONTROLS (Admin only)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 
 window.onFileChange = function(input) {
   if (!window.isAdmin()) return;
@@ -1837,13 +1819,12 @@ window.doUpload = async function() {
   reader.readAsArrayBuffer(file);
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  PDF RESULTS PARSER â€” FULL EP CLUB DICTIONARY
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function parseResultsPDF(rawText, distance) {
 
-  // â”€â”€ COMPLETE EP CLUB DICTIONARY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // COMPLETE EP CLUB DICTIONARY
   // Ordered longest-first so multi-word names match before sub-strings.
   const CLUBS = [
     // Multi-word / full names first
@@ -1887,7 +1868,7 @@ function parseResultsPDF(rawText, distance) {
     'UNATTACHED',
   ];
 
-  // â”€â”€ CATEGORY TOKENS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // CATEGORY TOKENS 
   const CAT_SET = new Set([
     'SM','SF','JM','JF','OM','OF','VM','VF','M','F',
     'OPEN','MEN','WOMEN','SENIOR','JUNIOR','VETERAN','MASTERS',
@@ -1898,7 +1879,7 @@ function parseResultsPDF(rawText, distance) {
     'V40','V45','V50','V55','V60','V65','V70',
   ]);
 
-  // â”€â”€ REGEX PATTERNS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  //  REGEX PATTERNS 
   const TIME_RX = /\b(\d{1,2})[:.h](\d{2})(?:[:.m](\d{2}))?\b/;
   const POS_RX  = /^([HhWwMm]?)(\d{1,4})\.?$/;
   const LIC_RX  = /^\d{5,}$/;
@@ -1915,7 +1896,7 @@ function parseResultsPDF(rawText, distance) {
     return raw.replace(/\./g, ':').replace(/h/gi, ':');
   }
 
-  // â”€â”€ MAIN PARSE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  //  MAIN PARSE 
   const lines    = rawText.split('\n');
   const athletes = [];
 
@@ -1950,7 +1931,7 @@ function parseResultsPDF(rawText, distance) {
     let clubName     = 'Unattached';
     let nameTokens   = [];
 
-    // Step 1 â€” position from first token
+    // Step 1 position from first token
     if (tokens.length > 0) {
       const posM = tokens[0].match(POS_RX);
       if (posM && !LIC_RX.test(tokens[0])) {
@@ -1959,10 +1940,10 @@ function parseResultsPDF(rawText, distance) {
       }
     }
 
-    // Step 2 â€” remove licence/bib numbers
+    // Step 2 âremove licence/bib numbers
     const cleaned = tokens.filter(t => !LIC_RX.test(t));
 
-    // Step 3 â€” detect club (multi-word aware, longest first)
+    // Step 3  detect club (multi-word aware, longest first)
     const joinedUpper = cleaned.map(t => t.toUpperCase()).join(' ');
     let clubMatch = null;
     for (const club of CLUBS) {
@@ -1970,7 +1951,7 @@ function parseResultsPDF(rawText, distance) {
     }
     if (clubMatch) clubName = clubMatch;
 
-    // Step 4 â€” detect category token
+    // Step 4 detect category token
     let catFound = '';
     const afterClubRemoval = cleaned.filter(t => {
       const u = t.toUpperCase();
@@ -1984,7 +1965,7 @@ function parseResultsPDF(rawText, distance) {
     });
     if (catFound) category = catFound;
 
-    // Step 5 â€” remaining tokens are the name
+    // Step 5 ” remaining tokens are the name
     nameTokens = afterClubRemoval.filter(t => {
       const u = t.toUpperCase();
       if (SKIP_WORDS.has(u)) return false;
@@ -2023,9 +2004,7 @@ function parseResultsPDF(rawText, distance) {
   return normalizeAthletesForDisplay(deduped);
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  RESULTS INIT
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 async function initResults() {
   await reloadResultsCache();
@@ -2038,9 +2017,9 @@ async function initResults() {
   }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  KEYBOARD SHORTCUTS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 
 document.addEventListener('keydown', e => {
   const viewer  = document.getElementById('viewer');
@@ -2059,9 +2038,9 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  DOM CONTENT LOADED â€” INIT EVERYTHING
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
