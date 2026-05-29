@@ -764,6 +764,8 @@ nav.scrolled{height:60px; box-shadow: 0 4px 20px rgba(0,71,171,0.06);}
   background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:22px;
   box-shadow:0 8px 24px rgba(0,0,0,.04);
 }
+.training-upload-panel,
+.training-upload-panel *{box-sizing:border-box;}
 .training-upload-panel input,
 .training-upload-panel textarea{
   width:100%;border:2px solid var(--b);border-radius:4px;background:#fff;color:var(--tx);
@@ -772,7 +774,7 @@ nav.scrolled{height:60px; box-shadow: 0 4px 20px rgba(0,71,171,0.06);}
 .training-upload-panel textarea{grid-column:1/-1;min-height:92px;resize:vertical;}
 .training-upload-panel input:focus,
 .training-upload-panel textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,71,171,.1);}
-.training-datetime-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;min-width:0;}
+.training-datetime-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;min-width:0;max-width:100%;}
 .training-datetime-row input{min-width:0;}
 .training-file-btn,
 .training-post-btn{
@@ -922,7 +924,7 @@ footer{
   .pdf-admin { flex-direction: column; align-items: stretch; padding:20px;}
   .pdf-admin input[type="text"] { min-width: 100%; }
   .training-upload-panel{grid-template-columns:1fr;padding:18px;}
-  .training-datetime-row{grid-template-columns:1fr 1fr;width:100%;}
+  .training-datetime-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);width:100%;max-width:100%;}
   .event-results-view{width:100%;overflow:hidden;}
   .table-wrap{overflow-x:hidden;}
   .rtbl{table-layout:fixed;width:100%;min-width:0;}
