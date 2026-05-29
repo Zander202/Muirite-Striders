@@ -142,8 +142,14 @@
   <div class="training-upload-panel admin-only" id="trainingUploadPanel" style="display:none;">
     <input type="text" id="trainingTitle" placeholder="Training run title">
     <div class="training-datetime-row">
-      <input type="date" id="trainingDate" aria-label="Training run date">
-      <input type="time" id="trainingTime" aria-label="Training run time">
+      <label class="training-field-label" for="trainingDate">
+        <span>Date</span>
+        <input type="date" id="trainingDate">
+      </label>
+      <label class="training-field-label" for="trainingTime">
+        <span>Time</span>
+        <input type="time" id="trainingTime">
+      </label>
     </div>
     <input type="text" id="trainingLocation" placeholder="Location">
     <textarea id="trainingNotes" placeholder="Short note for everyone"></textarea>
