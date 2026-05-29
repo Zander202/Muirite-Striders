@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://muirite-strider.co.za/sitemap.xml
