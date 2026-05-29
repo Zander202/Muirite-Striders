@@ -741,6 +741,7 @@ let epaRacePhotos = {};
 let currentRaceFilter = 'all';
 let epaRacesExpanded = false;
 let trainingPhotoFile = null;
+let trainingUploadInFlight = false;
 const RC_EVENT_IMAGES = {
   'bcmac-10km': 'https://admin.runningcalendar.co.za/storage/edition/5927/5MHXBfTK6HKJLZDkBJvvODJ5XUeOjwKBnGUQ8Bvh.webp',
   'cape-st-francis-resort-road-run-walk': 'https://admin.runningcalendar.co.za/storage/edition/6062/cape-st-francis-resort-road-run.webp',
@@ -1098,7 +1099,9 @@ window.renderTrainingRuns = async function() {
       ? `<button type="button" class="training-remove" onclick="window.deleteTrainingRun('${album.id}', '${photo?.image_url || ''}')">Remove</button>`
       : '';
     return `<article class="training-card">
-      <img src="${img}" alt="${window.es(run.title || 'Training run')}" loading="lazy"${fallbackAttr()}>
+      <button type="button" class="training-photo-btn" data-src="${window.es(img)}" data-title="${window.es(run.title || 'Training run')}" onclick="window.openTrainingPhotoFromButton(this)" aria-label="Open ${window.es(run.title || 'training run')} photo">
+        <img src="${img}" alt="${window.es(run.title || 'Training run')}" loading="lazy"${fallbackAttr()}>
+      </button>
       <div class="training-card-body">
         <div class="training-date">${window.es(formatDisplayDate(run.date))}</div>
         <h3>${window.es(run.title || 'Training Run')}</h3>
@@ -1110,8 +1113,17 @@ window.renderTrainingRuns = async function() {
   }).join('');
 };
 
+window.openTrainingPhoto = function(imageUrl, title = 'Training run') {
+  openViewer(0, [{ image_url: imageUrl, title }]);
+};
+
+window.openTrainingPhotoFromButton = function(button) {
+  window.openTrainingPhoto(button?.dataset?.src || 'logo.JPG', button?.dataset?.title || 'Training run');
+};
+
 window.uploadTrainingRun = async function() {
   if (!window.isAdmin()) return;
+  if (trainingUploadInFlight) return;
   const title = document.getElementById('trainingTitle')?.value.trim();
   const date = document.getElementById('trainingDate')?.value;
   const location = document.getElementById('trainingLocation')?.value.trim();
@@ -1120,48 +1132,62 @@ window.uploadTrainingRun = async function() {
     toast('Add a title, date, and photo for the training run.', 'error');
     return;
   }
+  trainingUploadInFlight = true;
+  const postBtn = document.querySelector('.training-post-btn');
+  if (postBtn) {
+    postBtn.disabled = true;
+    postBtn.textContent = 'Posting...';
+  }
   toast('Uploading training run...', 'info');
-  const run = { title, date, location, notes };
-  const { data: album, error: albumErr } = await supabase
-    .from('albums')
-    .insert({ name: encodeTrainingAlbumName(run) })
-    .select('id')
-    .single();
-  if (albumErr) {
-    toast(`Training run save failed: ${albumErr.message}`, 'error');
-    return;
+  try {
+    const run = { title, date, location, notes };
+    const { data: album, error: albumErr } = await supabase
+      .from('albums')
+      .insert({ name: encodeTrainingAlbumName(run) })
+      .select('id')
+      .single();
+    if (albumErr) {
+      toast(`Training run save failed: ${albumErr.message}`, 'error');
+      return;
+    }
+    const safeName = trainingPhotoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const storagePath = `training-runs/${album.id}/${Date.now()}_${safeName}`;
+    const { error: upErr } = await supabase.storage
+      .from('album-images')
+      .upload(storagePath, trainingPhotoFile, { upsert: false, cacheControl: '31536000' });
+    if (upErr) {
+      await supabase.from('albums').delete().eq('id', album.id);
+      toast(`Training photo upload failed: ${upErr.message}`, 'error');
+      return;
+    }
+    const { data: { publicUrl } } = supabase.storage.from('album-images').getPublicUrl(storagePath);
+    const { error: imageErr } = await supabase
+      .from('images')
+      .insert({ album_id: album.id, image_url: publicUrl });
+    if (imageErr) {
+      await supabase.storage.from('album-images').remove([storagePath]);
+      await supabase.from('albums').delete().eq('id', album.id);
+      toast(`Photo uploaded but database save failed: ${imageErr.message}`, 'error');
+      return;
+    }
+    ['trainingTitle', 'trainingDate', 'trainingLocation', 'trainingNotes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const photoInput = document.getElementById('trainingPhotoInput');
+    if (photoInput) photoInput.value = '';
+    trainingPhotoFile = null;
+    const label = document.getElementById('trainingPhotoName');
+    if (label) label.textContent = 'No photo selected';
+    await window.renderTrainingRuns();
+    toast('Training run posted.', 'success');
+  } finally {
+    trainingUploadInFlight = false;
+    if (postBtn) {
+      postBtn.disabled = false;
+      postBtn.textContent = 'Post Training Run';
+    }
   }
-  const safeName = trainingPhotoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const storagePath = `training-runs/${album.id}/${Date.now()}_${safeName}`;
-  const { error: upErr } = await supabase.storage
-    .from('album-images')
-    .upload(storagePath, trainingPhotoFile, { upsert: false, cacheControl: '31536000' });
-  if (upErr) {
-    await supabase.from('albums').delete().eq('id', album.id);
-    toast(`Training photo upload failed: ${upErr.message}`, 'error');
-    return;
-  }
-  const { data: { publicUrl } } = supabase.storage.from('album-images').getPublicUrl(storagePath);
-  const { error: imageErr } = await supabase
-    .from('images')
-    .insert({ album_id: album.id, image_url: publicUrl });
-  if (imageErr) {
-    await supabase.storage.from('album-images').remove([storagePath]);
-    await supabase.from('albums').delete().eq('id', album.id);
-    toast(`Photo uploaded but database save failed: ${imageErr.message}`, 'error');
-    return;
-  }
-  ['trainingTitle', 'trainingDate', 'trainingLocation', 'trainingNotes'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  const photoInput = document.getElementById('trainingPhotoInput');
-  if (photoInput) photoInput.value = '';
-  trainingPhotoFile = null;
-  const label = document.getElementById('trainingPhotoName');
-  if (label) label.textContent = 'No photo selected';
-  await window.renderTrainingRuns();
-  toast('Training run posted.', 'success');
 };
 
 window.deleteTrainingRun = async function(albumId, imageUrl) {
@@ -1446,7 +1472,11 @@ function openViewer(i, photos) {
   viewerPhotos = photos;
   viewerIndex  = i;
   showViewerPhoto();
-  document.getElementById('viewer')?.classList.add('open');
+  const viewer = document.getElementById('viewer');
+  if (viewer) {
+    viewer.classList.toggle('single-photo', viewerPhotos.length <= 1);
+    viewer.classList.add('open');
+  }
 }
 function showViewerPhoto() {
   const photo = viewerPhotos[viewerIndex];
@@ -1458,7 +1488,10 @@ function showViewerPhoto() {
   }
   if (cnt) cnt.textContent = `${viewerIndex + 1} / ${viewerPhotos.length}`;
 }
-window.closeViewer  = function() { document.getElementById('viewer')?.classList.remove('open'); };
+window.closeViewer  = function() {
+  const viewer = document.getElementById('viewer');
+  viewer?.classList.remove('open', 'single-photo');
+};
 window.viewerNav    = function(dir) {
   if (!viewerPhotos.length) return;
   viewerIndex = (viewerIndex + dir + viewerPhotos.length) % viewerPhotos.length;

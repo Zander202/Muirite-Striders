@@ -220,6 +220,16 @@ One Stride. One Team. One Community. </p>
   </div>
   <button type="button" class="social-toggle" onclick="window.toggleSocialFloat(event)" aria-expanded="false" aria-controls="socialFloat" aria-label="Open social links">+</button>
 </div>
+
+<!-- PHOTO VIEWER -->
+<div class="viewer" id="viewer">
+  <span class="viewer-counter" id="viewerCounter"></span>
+  <button class="viewer-close" onclick="window.closeViewer()" aria-label="Close photo">✕</button>
+  <button class="viewer-prev" onclick="window.viewerNav(-1)" aria-label="Previous photo">←</button>
+  <img id="viewerImg" src="" alt="" onerror="this.onerror=null;this.src='logo.JPG'">
+  <button class="viewer-next" onclick="window.viewerNav(1)" aria-label="Next photo">→</button>
+  <button class="viewer-dl" onclick="window.downloadCurrent()">↓ Download</button>
+</div>
 <script defer src="/_vercel/insights/script.js"></script>
 <script type="module" src="script.js"></script>
 </body>
