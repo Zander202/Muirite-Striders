@@ -1047,7 +1047,7 @@ function decodeTrainingAlbumName(name) {
   try {
     return JSON.parse(raw);
   } catch {
-    return { title: raw || 'Training Run', date: '', location: '', notes: '' };
+    return { title: raw || 'Training Run', date: '', time: '', location: '', notes: '' };
   }
 }
 
@@ -1056,6 +1056,13 @@ function formatDisplayDate(value) {
   const d = new Date(`${value}T00:00:00`);
   if (Number.isNaN(d.getTime())) return value;
   return d.toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatDisplayTime(value) {
+  if (!value) return '';
+  const [hours, minutes] = String(value).split(':');
+  if (!hours || !minutes) return value;
+  return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
 }
 
 window.handleTrainingPhotoPick = function(event) {
@@ -1103,7 +1110,7 @@ window.renderTrainingRuns = async function() {
         <img src="${img}" alt="${window.es(run.title || 'Training run')}" loading="lazy"${fallbackAttr()}>
       </button>
       <div class="training-card-body">
-        <div class="training-date">${window.es(formatDisplayDate(run.date))}</div>
+        <div class="training-date">${window.es([formatDisplayDate(run.date), formatDisplayTime(run.time)].filter(Boolean).join(' - '))}</div>
         <h3>${window.es(run.title || 'Training Run')}</h3>
         ${run.location ? `<div class="training-location">${window.es(run.location)}</div>` : ''}
         ${run.notes ? `<p>${window.es(run.notes)}</p>` : ''}
@@ -1126,6 +1133,7 @@ window.uploadTrainingRun = async function() {
   if (trainingUploadInFlight) return;
   const title = document.getElementById('trainingTitle')?.value.trim();
   const date = document.getElementById('trainingDate')?.value;
+  const time = document.getElementById('trainingTime')?.value;
   const location = document.getElementById('trainingLocation')?.value.trim();
   const notes = document.getElementById('trainingNotes')?.value.trim();
   if (!title || !date || !trainingPhotoFile) {
@@ -1140,7 +1148,7 @@ window.uploadTrainingRun = async function() {
   }
   toast('Uploading training run...', 'info');
   try {
-    const run = { title, date, location, notes };
+    const run = { title, date, time, location, notes };
     const { data: album, error: albumErr } = await supabase
       .from('albums')
       .insert({ name: encodeTrainingAlbumName(run) })
@@ -1170,7 +1178,7 @@ window.uploadTrainingRun = async function() {
       toast(`Photo uploaded but database save failed: ${imageErr.message}`, 'error');
       return;
     }
-    ['trainingTitle', 'trainingDate', 'trainingLocation', 'trainingNotes'].forEach(id => {
+    ['trainingTitle', 'trainingDate', 'trainingTime', 'trainingLocation', 'trainingNotes'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
