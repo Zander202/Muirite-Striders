@@ -656,11 +656,11 @@ const big3 = [
   {
     num: '03',
     n: 'Comrades Marathon',
-    l: 'Pietermaritzburg to Durban',
+    l: 'Durban to Pietermaritzburg ',
     date: '14 June 2026',
     raceDate: '2026-06-14',
-    ds: ['90km Ultra', 'Down Run'],
-    desc: "The world's greatest ultra-marathon, 90km of grit, heart and South African spirit.",
+    ds: ['85.77km Ultra', 'Up Run'],
+    desc: "The world's greatest ultra-marathon, 85.77km of grit, heart and South African spirit.",
     img: 'https://www.comrades.com/system/refinery/images/W1siZiIsIjIwMjYvMDQvMzAvMDcvNDIvMTQvMjk3M2E5YzctNjlhYy00ZTViLWI0NGMtOWUwY2U5MDQ0YWYxL0NvbXJhZGVzX0dlcmRhU3RleW5fMjAyNS5qcGciXSxbInAiLCJ0aHVtYiIsIjgweDYwI2MiXV0/Comrades_GerdaSteyn_2025.jpg',
     logo: 'https://www.comrades.com/assets/logo.svg',
     u: 'https://www.comrades.com'
