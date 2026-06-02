@@ -20,6 +20,59 @@ function fallbackAttr() {
   return ' onerror="window.useImageFallback(this)"';
 }
 
+function imageLoadAttr() {
+  return ' loading="lazy" decoding="async" onerror="window.useImageFallback(this)"';
+}
+
+function imageNameWithExtension(name, extension) {
+  const safeBase = String(name || 'photo')
+    .replace(/\.[^.]+$/, '')
+    .replace(/[^a-zA-Z0-9._-]/g, '_') || 'photo';
+  return `${safeBase}.${extension}`;
+}
+
+async function compressImageForUpload(file, options = {}) {
+  const {
+    maxDimension = 1600,
+    quality = 0.78,
+    mimeType = 'image/jpeg'
+  } = options;
+
+  if (!file?.type?.startsWith('image/') || file.type === 'image/gif') {
+    return { file, name: file?.name || 'upload' };
+  }
+
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = objectUrl;
+    });
+
+    const scale = Math.min(1, maxDimension / Math.max(img.naturalWidth, img.naturalHeight));
+    if (scale === 1 && file.size <= 500 * 1024) return { file, name: file.name };
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, quality));
+    if (!blob || blob.size >= file.size) return { file, name: file.name };
+
+    const extension = mimeType === 'image/webp' ? 'webp' : 'jpg';
+    const compressed = new File([blob], imageNameWithExtension(file.name, extension), { type: mimeType });
+    return { file: compressed, name: compressed.name };
+  } catch {
+    return { file, name: file.name };
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 document.addEventListener('error', event => {
   if (event.target?.tagName === 'IMG') window.useImageFallback(event.target);
 }, true);
@@ -472,7 +525,7 @@ function renderCarouselSlides(slides) {
   const shuffled = shuffleList(slides);
   tr.innerHTML = shuffled.map(slide => `
     <div class="cs">
-      <img src="${window.es(slide.src)}" alt="${window.es(slide.title || 'Race photo')}"${fallbackAttr()}>
+      <img src="${window.es(slide.src)}" alt="${window.es(slide.title || 'Race photo')}" decoding="async"${fallbackAttr()}>
     </div>`).join('');
   tr.classList.remove('carousel-loading');
   sl = shuffled.length;
@@ -549,7 +602,7 @@ function renderCarouselManager() {
   }
   list.innerHTML = carouselPhotos.map(photo => `
     <div class="carousel-admin-item">
-      <img src="${photo.image_url}" alt="Carousel photo" loading="lazy"${fallbackAttr()}>
+      <img src="${photo.image_url}" alt="Carousel photo"${imageLoadAttr()}>
       <button type="button" onclick="window.deleteCarouselPhoto('${photo.id}', '${photo.image_url}')">Remove</button>
     </div>`).join('');
 }
@@ -588,9 +641,10 @@ window.addCarouselPhotos = async function(event) {
   if (!albumId) return;
   toast(`Uploading ${files.length} carousel photo${files.length === 1 ? '' : 's'}...`, 'info');
   const uploads = await Promise.all(files.map(async (file, index) => {
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const prepared = await compressImageForUpload(file, { maxDimension: 1600, quality: 0.78 });
+    const safeName = prepared.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const storagePath = `carousel/${albumId}/${Date.now()}_${index}_${safeName}`;
-    const { error } = await supabase.storage.from('album-images').upload(storagePath, file, { upsert: false, cacheControl: '31536000' });
+    const { error } = await supabase.storage.from('album-images').upload(storagePath, prepared.file, { upsert: false, cacheControl: '31536000' });
     if (error) return { error: error.message };
     const { data: { publicUrl } } = supabase.storage.from('album-images').getPublicUrl(storagePath);
     return { album_id: albumId, image_url: publicUrl };
@@ -931,8 +985,8 @@ function rr(filter) {
         </label>
       </div>` : '';
     return `<div class="rc has-img">
-      <img class="rc-img" src="${r.img}" alt="${window.es(r.n)}" loading="lazy"${fallbackAttr()}><div class="rc-ov"></div>
-      ${r.logo ? `<div class="rc-logo"><img src="${r.logo}" alt="Eastern Province Athletics logo" loading="lazy"${fallbackAttr()}></div>` : ''}
+      <img class="rc-img" src="${r.img}" alt="${window.es(r.n)}"${imageLoadAttr()}><div class="rc-ov"></div>
+      ${r.logo ? `<div class="rc-logo"><img src="${r.logo}" alt="Eastern Province Athletics logo"${imageLoadAttr()}></div>` : ''}
       <div class="rc-body">
         <div class="rdr">
           <div class="rday">${r.d}</div>
@@ -988,11 +1042,12 @@ window.uploadEpaRacePhoto = async function(key, event) {
     return;
   }
   toast('Uploading race photo...', 'info');
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const prepared = await compressImageForUpload(file, { maxDimension: 1400, quality: 0.76 });
+  const safeName = prepared.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const storagePath = `epa-races/${key}/${Date.now()}_${safeName}`;
   const { error: upErr } = await supabase.storage
     .from('album-images')
-    .upload(storagePath, file, { upsert: true, cacheControl: '31536000' });
+    .upload(storagePath, prepared.file, { upsert: true, cacheControl: '31536000' });
   if (upErr) {
     toast(`Upload failed: ${upErr.message}`, 'error');
     event.target.value = '';
@@ -1107,7 +1162,7 @@ window.renderTrainingRuns = async function() {
       : '';
     return `<article class="training-card">
       <button type="button" class="training-photo-btn" data-src="${window.es(img)}" data-title="${window.es(run.title || 'Training run')}" onclick="window.openTrainingPhotoFromButton(this)" aria-label="Open ${window.es(run.title || 'training run')} photo">
-        <img src="${img}" alt="${window.es(run.title || 'Training run')}" loading="lazy"${fallbackAttr()}>
+        <img src="${img}" alt="${window.es(run.title || 'Training run')}"${imageLoadAttr()}>
       </button>
       <div class="training-card-body">
         <div class="training-date">${window.es([formatDisplayDate(run.date), formatDisplayTime(run.time)].filter(Boolean).join(' - '))}</div>
@@ -1158,11 +1213,12 @@ window.uploadTrainingRun = async function() {
       toast(`Training run save failed: ${albumErr.message}`, 'error');
       return;
     }
-    const safeName = trainingPhotoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const prepared = await compressImageForUpload(trainingPhotoFile, { maxDimension: 1400, quality: 0.76 });
+    const safeName = prepared.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const storagePath = `training-runs/${album.id}/${Date.now()}_${safeName}`;
     const { error: upErr } = await supabase.storage
       .from('album-images')
-      .upload(storagePath, trainingPhotoFile, { upsert: false, cacheControl: '31536000' });
+      .upload(storagePath, prepared.file, { upsert: false, cacheControl: '31536000' });
     if (upErr) {
       await supabase.from('albums').delete().eq('id', album.id);
       toast(`Training photo upload failed: ${upErr.message}`, 'error');
@@ -1275,16 +1331,10 @@ window.renderAlbums = async function() {
     card.className = 'album-card';
 
     let thumbHtml;
-    if (photos.length >= 4) {
-      thumbHtml = `<div class="album-mosaic">
-        ${photos.slice(0, 4).map(p => `<img src="${p.image_url}" alt=""${fallbackAttr()}>`).join('')}
-        ${photos.length > 4 ? `<div class="mosaic-more">+${photos.length - 4}</div>` : ''}
-        <div class="album-thumb-overlay"></div>
-        <div class="album-open-label">Open Album</div>
-      </div>`;
-    } else if (photos.length > 0) {
+    if (photos.length > 0) {
       thumbHtml = `<div class="album-thumb">
-        <img src="${photos[0].image_url}" alt=""${fallbackAttr()}>
+        <img src="${photos[0].image_url}" alt=""${imageLoadAttr()}>
+        ${photos.length > 1 ? `<div class="mosaic-more">+${photos.length - 1}</div>` : ''}
         <div class="album-thumb-overlay"></div>
         <div class="album-open-label">Open Album</div>
       </div>`;
@@ -1397,7 +1447,7 @@ async function renderPhotos() {
         ? `<button class="photo-btn dl"  onclick="event.stopPropagation();window.downloadPhoto('${photo.image_url}','${window.es(fileName)}')">Download</button>
            <button class="photo-btn del" onclick="event.stopPropagation();window.deletePhoto('${photo.id}','${photo.image_url}')">Remove</button>`
         : `<button class="photo-btn dl"  onclick="event.stopPropagation();window.downloadPhoto('${photo.image_url}','${window.es(fileName)}')">Download</button>`;
-      item.innerHTML = `<img src="${photo.image_url}" alt="${window.es(fileName)}"${fallbackAttr()}><div class="photo-actions">${adminActions}</div>`;
+      item.innerHTML = `<img src="${photo.image_url}" alt="${window.es(fileName)}"${imageLoadAttr()}><div class="photo-actions">${adminActions}</div>`;
       item.querySelector('img').onclick = () => openViewer(i, photos);
       grid.appendChild(item);
     });
@@ -1410,9 +1460,10 @@ window.addPhotos = async function(e) {
   const albumId = currentAlbumId;
   toast(`Uploading ${files.length} photo${files.length === 1 ? '' : 's'}...`, 'info');
   const uploads = await Promise.all(files.map(async (file, index) => {
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const prepared = await compressImageForUpload(file, { maxDimension: 1400, quality: 0.76 });
+    const safeName = prepared.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const storagePath = `${albumId}/${Date.now()}_${index}_${safeName}`;
-    const { error: upErr } = await supabase.storage.from('album-images').upload(storagePath, file, { upsert: false, cacheControl: '31536000' });
+    const { error: upErr } = await supabase.storage.from('album-images').upload(storagePath, prepared.file, { upsert: false, cacheControl: '31536000' });
     if (upErr) return { error: upErr.message };
     const { data: { publicUrl } } = supabase.storage.from('album-images').getPublicUrl(storagePath);
     return { album_id: albumId, image_url: publicUrl };
