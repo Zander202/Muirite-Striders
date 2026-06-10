@@ -479,6 +479,10 @@ nav.scrolled{height:60px; box-shadow: 0 4px 20px rgba(0,71,171,0.06);}
   background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.75);box-shadow:0 8px 20px rgba(0,0,0,.12);
 }
 .b3-logo img{max-width:100%;max-height:100%;object-fit:contain;}
+.b3-logo.comrades-logo{
+  width:68px;height:68px;padding:5px;border-radius:50%;
+  background:#050505;border:2px solid #ffd400;box-shadow:0 10px 24px rgba(0,0,0,.3);
+}
 
 /* Expanded Races UI */
 .ep-div{display:flex;align-items:center;gap:24px; margin-bottom:48px;}

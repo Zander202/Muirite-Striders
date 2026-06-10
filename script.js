@@ -73,6 +73,43 @@ async function compressImageForUpload(file, options = {}) {
   }
 }
 
+async function uploadFileToR2(file, path, fileName) {
+  const signRes = await fetch('/api/r2-upload-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      path,
+      fileName,
+      contentType: file.type || 'application/octet-stream'
+    })
+  });
+  const signed = await signRes.json().catch(() => ({}));
+  if (!signRes.ok) throw new Error(signed.error || 'R2 upload could not start');
+
+  const uploadRes = await fetch(signed.uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type || 'application/octet-stream' },
+    body: file
+  });
+  if (!uploadRes.ok) throw new Error(`R2 upload failed with ${uploadRes.status}`);
+  return signed.publicUrl;
+}
+
+async function deleteStoredImage(imageUrl) {
+  const supabasePath = storagePathFromUrl(imageUrl);
+  if (supabasePath) {
+    await supabase.storage.from('album-images').remove([supabasePath]);
+    return;
+  }
+  try {
+    await fetch('/api/r2-delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: imageUrl })
+    });
+  } catch {}
+}
+
 document.addEventListener('error', event => {
   if (event.target?.tagName === 'IMG') window.useImageFallback(event.target);
 }, true);
@@ -643,11 +680,12 @@ window.addCarouselPhotos = async function(event) {
   const uploads = await Promise.all(files.map(async (file, index) => {
     const prepared = await compressImageForUpload(file, { maxDimension: 1600, quality: 0.78 });
     const safeName = prepared.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storagePath = `carousel/${albumId}/${Date.now()}_${index}_${safeName}`;
-    const { error } = await supabase.storage.from('album-images').upload(storagePath, prepared.file, { upsert: false, cacheControl: '31536000' });
-    if (error) return { error: error.message };
-    const { data: { publicUrl } } = supabase.storage.from('album-images').getPublicUrl(storagePath);
-    return { album_id: albumId, image_url: publicUrl };
+    try {
+      const publicUrl = await uploadFileToR2(prepared.file, `carousel/${albumId}`, `${index}_${safeName}`);
+      return { album_id: albumId, image_url: publicUrl };
+    } catch (error) {
+      return { error: error.message };
+    }
   }));
   const rows = uploads.filter(item => !item.error);
   const failures = uploads.length - rows.length;
@@ -669,8 +707,7 @@ window.addCarouselPhotos = async function(event) {
 window.deleteCarouselPhoto = async function(id, imageUrl) {
   if (!window.isAdmin()) return;
   if (!confirm('Remove this carousel photo?')) return;
-  const path = storagePathFromUrl(imageUrl);
-  if (path) await supabase.storage.from('album-images').remove([path]);
+  await deleteStoredImage(imageUrl);
   await supabase.from('images').delete().eq('id', id);
   const uploadedSlides = await loadCarouselPhotos();
   renderCarouselSlides(uploadedSlides.length ? uploadedSlides : carouselFallbackSlides);
@@ -710,16 +747,21 @@ const big3 = [
   {
     num: '03',
     n: 'Comrades Marathon',
-    l: 'Durban to Pietermaritzburg ',
+    l: 'Durban to Pietermaritzburg',
     date: '14 June 2026',
     raceDate: '2026-06-14',
     ds: ['85.77km Ultra', 'Up Run'],
     desc: "The world's greatest ultra-marathon, 85.77km of grit, heart and South African spirit.",
-    img: 'https://www.comrades.com/system/refinery/images/W1siZiIsIjIwMjYvMDQvMzAvMDcvNDIvMTQvMjk3M2E5YzctNjlhYy00ZTViLWI0NGMtOWUwY2U5MDQ0YWYxL0NvbXJhZGVzX0dlcmRhU3RleW5fMjAyNS5qcGciXSxbInAiLCJ0aHVtYiIsIjgweDYwI2MiXV0/Comrades_GerdaSteyn_2025.jpg',
-    logo: 'https://www.comrades.com/assets/logo.svg',
-    u: 'https://www.comrades.com'
+    img: 'https://mosaic-cms.b-cdn.net/3k0rnfif4fsx6bhy7d7tx3tysti2',
+    logo: 'https://comrades.com/assets/Comrades_Marathon_Transparent-361f4d0d.png',
+    logoClass: 'comrades-logo',
+    u: 'https://comrades.com/'
   }
 ];
+
+function raceUrl(race) {
+  return race?.u || RC_BASE;
+}
 
 function raceStatusFromDate(dateValue) {
   const today = new Date();
@@ -750,12 +792,13 @@ function renderBig3() {
     const state = raceStatusFromDate(r.raceDate);
     const statusClass = state.status === 'soon' ? 'b3-soon' : state.status === 'upcoming' ? 'b3-upcoming' : 'b3-past';
     const dotClass = state.status === 'soon' ? 'soon' : state.status === 'upcoming' ? 'upcoming' : 'past';
-    return `<div class="b3c b3-${state.status}" data-num="${r.num}" onclick="window.open('${r.u}','_blank')">
+    const url = raceUrl(r);
+    return `<div class="b3c b3-${state.status}" data-num="${r.num}" onclick="window.open('${url}','_blank')">
       ${r.img ? `<div class="b3-img-wrap" style="position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit">
         <img src="${r.img}" alt="${window.es(r.n)}" style="width:100%;height:100%;object-fit:cover;opacity:0.28;filter:saturate(1.1)"${fallbackAttr()}>
         <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.6) 100%)"></div>
       </div>` : ''}
-      ${r.logo ? `<div class="b3-logo"><img src="${r.logo}" alt="${window.es(r.n)} logo" loading="lazy"${fallbackAttr()}></div>` : ''}
+      ${r.logo ? `<div class="b3-logo ${r.logoClass || ''}"><img src="${r.logo}" alt="${window.es(r.n)} logo" loading="lazy"${fallbackAttr()}></div>` : ''}
       <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%;">
         <div>
           <div class="b3badge ${statusClass}"><div class="b3-dot ${dotClass}"></div>${state.label}</div>
@@ -834,7 +877,7 @@ const EP_CALENDAR_2026 = [
   { date: '2026-05-31', d: '31', m: 'May', n: 'Mthatha Half-Marathon 2026', l: 'Mthatha', ds: ['21.1', '10'], t: 'half', u: `${RC_BASE}/events/mthatha-half-marathon` },
   { date: '2026-06-06', d: '06', m: 'Jun', n: 'VQS Diesel Depot 15km Challenge 2026', l: 'East London', ds: ['15', '5'], t: 'road', u: `${RC_BASE}/events/vqs-diesel-depot-15km-challenge` },
   { date: '2026-06-20', d: '20', m: 'Jun', n: 'Forest Run Challenge 2026', l: 'Gqeberha', ds: ['15', '5'], t: 'road', u: `${RC_BASE}/events/forest-run-challenge` },
-  { date: '2026-06-27', d: '27', m: 'Jun', n: 'Nelson Mandela Bay Half-Marathon 2026', l: 'Gqeberha', ds: ['21.1', '5'], t: 'half', u: `${RC_BASE}/events/nelson-mandela-bay-half-marathon` },
+  { date: '2026-06-27', d: '27', m: 'Jun', n: 'NMB Half-Marathon 2026', l: 'Gqeberha', ds: ['21.1', '5'], t: 'half', u: `${RC_BASE}/events/nmb-half-marathon` },
   { date: '2026-06-28', d: '28', m: 'Jun', n: 'ECLB Awareness Run 2026', l: 'East London', ds: ['21.1', '10', '4', '2'], t: 'half', u: `${RC_BASE}/events/eclb-awareness-run` },
   { date: '2026-07-04', d: '04', m: 'Jul', n: 'Makro 10km Road Race 2026', l: 'Gqeberha', ds: ['10', '5'], t: 'road', u: `${RC_BASE}/events/makro-10km-road-race` },
   { date: '2026-07-18', d: '18', m: 'Jul', n: 'Golden Oldies 10km 2026', l: 'East London', ds: ['10'], t: 'road', u: `${RC_BASE}/events/golden-oldies` },
@@ -925,7 +968,7 @@ function getActiveEPRaces() {
     .map(r => {
       const slug = String(r.u || '').split('/events/')[1] || '';
       const manualImg = epaRacePhotos[epaRaceKey(r)] || epaRacePhotos[r.date];
-      return { ...r, img: manualImg || r.img || RC_EVENT_IMAGES[slug] || RACE_IMG[r.t] || RACE_IMG.road, logo: r.logo || EPA_LOGO };
+      return { ...r, u: raceUrl(r), img: manualImg || r.img || RC_EVENT_IMAGES[slug] || RACE_IMG[r.t] || RACE_IMG.road, logo: r.logo || EPA_LOGO };
     });
 }
 
@@ -979,12 +1022,13 @@ function rr(filter) {
   const cardsHtml = visibleList.map(r => {
     const canUploadPhoto = admin;
     const key = epaRaceKey(r);
-    const uploadHtml = canUploadPhoto ? `<div class="race-photo-admin">
+    const url = raceUrl(r);
+    const uploadHtml = canUploadPhoto ? `<div class="race-photo-admin" onclick="event.stopPropagation()">
         <label class="race-photo-btn">Upload Photo
           <input type="file" accept="image/*" onchange="window.uploadEpaRacePhoto('${window.es(key)}', event)">
         </label>
       </div>` : '';
-    return `<div class="rc has-img">
+    return `<div class="rc has-img" role="link" tabindex="0" onclick="window.open('${url}', '_blank', 'noopener')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('${url}', '_blank', 'noopener')}">
       <img class="rc-img" src="${r.img}" alt="${window.es(r.n)}"${imageLoadAttr()}><div class="rc-ov"></div>
       ${r.logo ? `<div class="rc-logo"><img src="${r.logo}" alt="Eastern Province Athletics logo"${imageLoadAttr()}></div>` : ''}
       <div class="rc-body">
@@ -995,7 +1039,7 @@ function rr(filter) {
         <div class="rn">${window.es(r.n)}</div>
         <div class="dists">${r.ds.map(d => `<span class="di${parseFloat(d) >= 21 ? ' long' : ''}">${d}km</span>`).join('')}</div>
         ${uploadHtml}
-        <a href="${r.u}" target="_blank" rel="noopener" class="rl" onclick="event.stopPropagation()">Entry &amp; Details</a>
+        <a href="${url}" target="_blank" rel="noopener" class="rl" onclick="event.stopPropagation()">Entry &amp; Details</a>
       </div>
     </div>`;
   }).join('');
@@ -1044,16 +1088,14 @@ window.uploadEpaRacePhoto = async function(key, event) {
   toast('Uploading race photo...', 'info');
   const prepared = await compressImageForUpload(file, { maxDimension: 1400, quality: 0.76 });
   const safeName = prepared.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const storagePath = `epa-races/${key}/${Date.now()}_${safeName}`;
-  const { error: upErr } = await supabase.storage
-    .from('album-images')
-    .upload(storagePath, prepared.file, { upsert: true, cacheControl: '31536000' });
-  if (upErr) {
-    toast(`Upload failed: ${upErr.message}`, 'error');
+  let publicUrl;
+  try {
+    publicUrl = await uploadFileToR2(prepared.file, `epa-races/${key}`, safeName);
+  } catch (error) {
+    toast(`Upload failed: ${error.message}`, 'error');
     event.target.value = '';
     return;
   }
-  const { data: { publicUrl } } = supabase.storage.from('album-images').getPublicUrl(storagePath);
   let { data: album } = await supabase
     .from('albums')
     .select('id')
@@ -1215,21 +1257,19 @@ window.uploadTrainingRun = async function() {
     }
     const prepared = await compressImageForUpload(trainingPhotoFile, { maxDimension: 1400, quality: 0.76 });
     const safeName = prepared.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storagePath = `training-runs/${album.id}/${Date.now()}_${safeName}`;
-    const { error: upErr } = await supabase.storage
-      .from('album-images')
-      .upload(storagePath, prepared.file, { upsert: false, cacheControl: '31536000' });
-    if (upErr) {
+    let publicUrl;
+    try {
+      publicUrl = await uploadFileToR2(prepared.file, `training-runs/${album.id}`, safeName);
+    } catch (error) {
       await supabase.from('albums').delete().eq('id', album.id);
-      toast(`Training photo upload failed: ${upErr.message}`, 'error');
+      toast(`Training photo upload failed: ${error.message}`, 'error');
       return;
     }
-    const { data: { publicUrl } } = supabase.storage.from('album-images').getPublicUrl(storagePath);
     const { error: imageErr } = await supabase
       .from('images')
       .insert({ album_id: album.id, image_url: publicUrl });
     if (imageErr) {
-      await supabase.storage.from('album-images').remove([storagePath]);
+      await deleteStoredImage(publicUrl);
       await supabase.from('albums').delete().eq('id', album.id);
       toast(`Photo uploaded but database save failed: ${imageErr.message}`, 'error');
       return;
@@ -1257,8 +1297,7 @@ window.uploadTrainingRun = async function() {
 window.deleteTrainingRun = async function(albumId, imageUrl) {
   if (!window.isAdmin()) return;
   if (!confirm('Remove this training run?')) return;
-  const path = storagePathFromUrl(imageUrl);
-  if (path) await supabase.storage.from('album-images').remove([path]);
+  await deleteStoredImage(imageUrl);
   await supabase.from('images').delete().eq('album_id', albumId);
   await supabase.from('albums').delete().eq('id', albumId);
   await window.renderTrainingRuns();
@@ -1396,8 +1435,7 @@ window.deleteAlbum = async function(id) {
   if (!confirm(`Delete album "${album?.name || 'this album'}" and all its photos?`)) return;
   const { data: photos } = await supabase.from('images').select('image_url').eq('album_id', id);
   if (photos?.length) {
-    const paths = photos.map(p => storagePathFromUrl(p.image_url)).filter(Boolean);
-    if (paths.length) await supabase.storage.from('album-images').remove(paths);
+    await Promise.all(photos.map(photo => deleteStoredImage(photo.image_url)));
     await supabase.from('images').delete().eq('album_id', id);
   }
   const { error: albumDelErr } = await supabase.from('albums').delete().eq('id', id);
@@ -1462,11 +1500,12 @@ window.addPhotos = async function(e) {
   const uploads = await Promise.all(files.map(async (file, index) => {
     const prepared = await compressImageForUpload(file, { maxDimension: 1400, quality: 0.76 });
     const safeName = prepared.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storagePath = `${albumId}/${Date.now()}_${index}_${safeName}`;
-    const { error: upErr } = await supabase.storage.from('album-images').upload(storagePath, prepared.file, { upsert: false, cacheControl: '31536000' });
-    if (upErr) return { error: upErr.message };
-    const { data: { publicUrl } } = supabase.storage.from('album-images').getPublicUrl(storagePath);
-    return { album_id: albumId, image_url: publicUrl };
+    try {
+      const publicUrl = await uploadFileToR2(prepared.file, `albums/${albumId}`, `${index}_${safeName}`);
+      return { album_id: albumId, image_url: publicUrl };
+    } catch (error) {
+      return { error: error.message };
+    }
   }));
   const rows = uploads.filter(item => !item.error);
   const failures = uploads.length - rows.length;
@@ -1482,8 +1521,7 @@ window.addPhotos = async function(e) {
 window.deletePhoto = async function(id, imageUrl) {
   if (!window.isAdmin()) return;
   if (!confirm('Remove this photo?')) return;
-  const path = storagePathFromUrl(imageUrl);
-  if (path) await supabase.storage.from('album-images').remove([path]);
+  await deleteStoredImage(imageUrl);
   await supabase.from('images').delete().eq('id', id);
   await renderPhotos();
   window.renderAlbums();
