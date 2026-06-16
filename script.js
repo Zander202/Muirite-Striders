@@ -74,25 +74,18 @@ async function compressImageForUpload(file, options = {}) {
 }
 
 async function uploadFileToR2(file, path, fileName) {
-  const signRes = await fetch('/api/r2-upload-url', {
+  const uploadRes = await fetch('/api/r2-upload', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      path,
-      fileName,
-      contentType: file.type || 'application/octet-stream'
-    })
-  });
-  const signed = await signRes.json().catch(() => ({}));
-  if (!signRes.ok) throw new Error(signed.error || 'R2 upload could not start');
-
-  const uploadRes = await fetch(signed.uploadUrl, {
-    method: 'PUT',
-    headers: { 'Content-Type': file.type || 'application/octet-stream' },
+    headers: {
+      'Content-Type': file.type || 'application/octet-stream',
+      'X-R2-Path': encodeURIComponent(path),
+      'X-R2-File-Name': encodeURIComponent(fileName)
+    },
     body: file
   });
-  if (!uploadRes.ok) throw new Error(`R2 upload failed with ${uploadRes.status}`);
-  return signed.publicUrl;
+  const uploaded = await uploadRes.json().catch(() => ({}));
+  if (!uploadRes.ok) throw new Error(uploaded.error || `R2 upload failed with ${uploadRes.status}`);
+  return uploaded.publicUrl;
 }
 
 async function deleteStoredImage(imageUrl) {
