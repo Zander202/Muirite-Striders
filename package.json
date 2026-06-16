@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "migrate:photos:dry-run": "node scripts/migrate-supabase-images-to-r2.js",
+    "migrate:photos": "node scripts/migrate-supabase-images-to-r2.js --apply"
+  },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.0",
