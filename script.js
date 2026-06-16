@@ -1530,8 +1530,9 @@ function openDownloadUrl(url) {
 }
 window.downloadPhoto = async function(url, name) {
   const fileName = name || 'photo.jpg';
+  const downloadUrl = `/api/r2-download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(fileName)}`;
   try {
-    const res = await fetch(url, { mode: 'cors', cache: 'force-cache' });
+    const res = await fetch(downloadUrl, { cache: 'force-cache' });
     if (!res.ok) throw new Error('Download request failed');
     const blob = await res.blob();
     const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
@@ -1555,7 +1556,7 @@ window.downloadPhoto = async function(url, name) {
     setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
   } catch (err) {
     if (err?.name === 'AbortError') return;
-    openDownloadUrl(url);
+    openDownloadUrl(downloadUrl);
   }
 };
 function openViewer(i, photos) {
