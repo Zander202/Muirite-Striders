@@ -851,16 +851,22 @@ nav.scrolled{height:60px; box-shadow: 0 4px 20px rgba(0,71,171,0.06);}
 /* ── CONTACT ─────────────────────────────────── */
 #contact{padding:100px 52px;background:#fff;border-top:1px solid var(--b);}
 .cg2{display:grid;grid-template-columns:1fr 1fr;gap:30px;max-width:1000px;}
+.contact-forms{margin-top:30px;}
 .cc2{background:var(--bg);padding:50px; border-radius:8px; border:1px solid var(--b); box-shadow:0 6px 20px rgba(0,0,0,0.03);}
 .cc2 h3{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--w);margin-bottom:20px;}
 .cc2 p{font-family:'Barlow',sans-serif;font-size:16px;color:var(--tx);line-height:1.8; font-weight:500;}
+.asa-card{grid-column:1/-1;}
+.asa-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:28px;}
 .bwa{
   display:inline-flex;align-items:center;gap:10px; margin-top:28px;padding:14px 32px;border-radius:4px;
   background:#fff;border:2px solid var(--wa); color:var(--wa);
   font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
   transition:all .2s;cursor:pointer; box-shadow:0 6px 15px rgba(37,211,102,0.15);
 }
+.asa-actions .bwa{margin-top:0;}
+.asa-download{border-color:var(--accent);color:var(--accent);box-shadow:0 6px 15px rgba(0,71,171,0.15);}
 .bwa:hover{background:var(--wa);color:#fff; transform:translateY(-3px); box-shadow:0 10px 20px rgba(37,211,102,0.25);}
+.asa-download:hover{background:var(--accent);color:#fff;box-shadow:0 10px 20px rgba(0,71,171,0.25);}
 /* ── FOOTER ──────────────────────────────────── */
 footer{
   padding:40px 52px; display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;
